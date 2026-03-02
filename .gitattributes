@@ -1,0 +1,2 @@
+# No LFS tracking needed - node_modules is gitignored
+*.node !text !filter !merge !diff
