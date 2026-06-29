@@ -18,15 +18,25 @@ export default function Home() {
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     className="text-6xl md:text-8xl font-black tracking-tighter mb-6 lowercase"
                 >
-                    {t("hero.title").split(" ")[0]} <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-periwinkle to-indigo-400 pr-2 pb-2">
-                        {t("hero.title").split(" ")[1]}
-                    </span>
+                    {(() => {
+                        const words = t("hero.title").split(" ");
+                        return (
+                            <>
+                                {words[0]}{" "}
+                                {words.length > 1 && (
+                                    <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-periwinkle to-indigo-400 pr-2 pb-2">
+                                        {words.slice(1).join(" ")}
+                                    </span>
+                                )}
+                            </>
+                        );
+                    })()}
                 </motion.h1>
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-lg md:text-2xl font-medium text-slate-500 max-w-2xl mx-auto leading-relaxed"
+                    className="text-lg md:text-2xl font-medium text-slate-light max-w-2xl mx-auto leading-relaxed"
                 >
                     {t("hero.subtitle")}
                 </motion.p>
@@ -50,7 +60,7 @@ export default function Home() {
                         <motion.button
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
-                            className="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-slate-600 bg-white shadow-sm hover:shadow-md transition-all border border-slate-100"
+                            className="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-charcoal bg-off-white shadow-sm hover:shadow-md transition-all border border-slate-700"
                         >
                             {t("hero.cta.explore")}
                         </motion.button>

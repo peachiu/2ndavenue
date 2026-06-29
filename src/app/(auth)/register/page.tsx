@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useTranslation } from "@/context/TranslationContext";
 
 export default function RegisterPage() {
     const [firstName, setFirstName] = useState("");
@@ -13,6 +14,7 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,13 +35,12 @@ export default function RegisterPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.message || "Something went wrong. Please try again.");
+                setError(data.message || t("error_message"));
             } else {
-                // Success! Redirect to login
                 router.push("/login?registered=true");
             }
         } catch (err) {
-            setError("Something went wrong. Please try again later.");
+            setError(t("error_message"));
         } finally {
             setIsLoading(false);
         }
@@ -48,57 +49,57 @@ export default function RegisterPage() {
     return (
         <div className="space-y-8">
             <div className="text-center lg:text-left">
-                <h1 className="text-5xl font-black lowercase tracking-tighter mb-2">create account</h1>
-                <p className="text-slate-500 font-medium">start your aesthetic journey.</p>
+                <h1 className="text-5xl font-black lowercase tracking-tighter mb-2">{t("create_account")}</h1>
+                <p className="text-slate-light font-medium">{t("start_your_journey")}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="clay-card p-10 space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-bold text-slate-700 ml-1 lowercase">first name</label>
+                        <label className="text-sm font-bold text-off-white ml-1 lowercase">{t("first_name")}</label>
                         <input
                             type="text"
                             required
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
                             placeholder="jane"
-                            className="w-full bg-off-white px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-400 font-medium text-slate-700 shadow-inner"
+                            className="w-full bg-hover-bg px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-lighter font-medium text-off-white shadow-inner"
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-bold text-slate-700 ml-1 lowercase">last name</label>
+                        <label className="text-sm font-bold text-off-white ml-1 lowercase">{t("last_name")}</label>
                         <input
                             type="text"
                             required
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             placeholder="doe"
-                            className="w-full bg-off-white px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-400 font-medium text-slate-700 shadow-inner"
+                            className="w-full bg-hover-bg px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-lighter font-medium text-off-white shadow-inner"
                         />
                     </div>
                 </div>
 
                 <div className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-bold text-slate-700 ml-1 lowercase">email</label>
+                        <label className="text-sm font-bold text-off-white ml-1 lowercase">{t("email")}</label>
                         <input
                             type="email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="you@example.com"
-                            className="w-full bg-off-white px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-400 font-medium text-slate-700 shadow-inner"
+                            className="w-full bg-hover-bg px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-lighter font-medium text-off-white shadow-inner"
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-bold text-slate-700 ml-1 lowercase">password</label>
+                        <label className="text-sm font-bold text-off-white ml-1 lowercase">{t("password")}</label>
                         <input
                             type="password"
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full bg-off-white px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-400 font-medium text-slate-700 shadow-inner"
+                            className="w-full bg-hover-bg px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-lighter font-medium text-off-white shadow-inner"
                         />
                     </div>
                 </div>
@@ -112,21 +113,21 @@ export default function RegisterPage() {
                     disabled={isLoading}
                     className="clay-btn w-full py-5 text-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isLoading ? "creating account..." : "sign up"}
+                    {isLoading ? t("creating_account") : t("sign_up")}
                 </button>
 
                 <div className="relative py-2">
                     <div className="absolute inset-0 flex items-center gap-4">
-                        <span className="w-full border-t border-slate-200" />
-                        <span className="text-xs lowercase font-bold text-slate-400 whitespace-nowrap">or join with</span>
-                        <span className="w-full border-t border-slate-200" />
+                        <span className="w-full border-t border-slate-700" />
+                        <span className="text-xs lowercase font-bold text-slate-lighter whitespace-nowrap">or join with</span>
+                        <span className="w-full border-t border-slate-700" />
                     </div>
                 </div>
 
                 <button
                     type="button"
                     onClick={() => signIn("google")}
-                    className="w-full py-4 rounded-full border-2 border-slate-100 font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center gap-3 bg-white"
+                    className="w-full py-4 rounded-full border-2 border-slate-700 font-bold text-off-white hover:bg-hover-bg transition-colors flex items-center justify-center gap-3 bg-card-bg"
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -134,12 +135,12 @@ export default function RegisterPage() {
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
-                    <span className="font-medium text-sm">join with google</span>
+                    <span className="font-medium text-sm">{t("join_with_google")}</span>
                 </button>
             </form>
 
             <p className="text-center text-slate-500 font-medium lowercase">
-                joined already? <Link href="/login" className="text-periwinkle font-bold hover:underline">sign in</Link>
+                {t("already_have_account")} <Link href="/login" className="text-periwinkle font-bold hover:underline">{t("sign_in")}</Link>
             </p>
         </div>
     );

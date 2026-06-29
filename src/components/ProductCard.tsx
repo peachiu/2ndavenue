@@ -36,10 +36,10 @@ export default function ProductCard({
         <motion.div
             whileHover={{ scale: 1.02, rotate: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className={`group h-full flex flex-col bg-white rounded-[2rem] border-2 border-slate-50 shadow-clay-card hover:shadow-clay-hover overflow-hidden isolate cursor-pointer transition-shadow ${className}`}
+            className={`group h-full flex flex-col bg-card-bg rounded-[2rem] border-2 border-slate-700 shadow-clay-card hover:shadow-clay-hover overflow-hidden isolate cursor-pointer transition-shadow ${className}`}
         >
-            <div className="relative flex-grow min-h-[250px] overflow-hidden rounded-t-[inherit] bg-slate-50">
-                <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-periwinkle shadow-sm">
+            <div className="relative flex-grow min-h-[250px] overflow-hidden rounded-t-[inherit] bg-hover-bg">
+                <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-card-bg/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-periwinkle shadow-sm">
                     {t(conditionKey)}
                 </div>
                 <Image
@@ -52,15 +52,15 @@ export default function ProductCard({
                 />
             </div>
 
-            <div className="p-6 bg-white/50 backdrop-blur-sm border-t border-white/20">
-                <h4 className="font-bold text-slate-800 lowercase truncate mb-1">
+            <div className="p-6 bg-card-bg/50 backdrop-blur-sm border-t border-slate-700">
+                <h4 className="font-bold text-off-white lowercase truncate mb-1">
                     {title}
                 </h4>
                 <div className="flex justify-between items-end">
                     <p className="text-xl font-black text-periwinkle">
                         {formatPrice(price, productCurrency)}
                     </p>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase italic">view details →</span>
+                    <span className="text-[10px] font-bold text-slate-lighter uppercase italic">ver detalhes →</span>
                 </div>
             </div>
         </motion.div>

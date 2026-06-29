@@ -1,22 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-    --color-off-white: #F2F0EF;
-    --color-periwinkle: #888DDD;
+    --color-charcoal: #0a0a0a;
+    --color-card-bg: #1a1a1a;
+    --color-off-white: #e5e5e5;
+    --color-slate-light: #a0a0a0;
+    --color-slate-lighter: #c8c8c8;
+    --color-periwinkle: #a8aef5;
+    --color-border-dark: #2a2a2a;
+    --color-hover-bg: #252525;
 
-    --shadow-clay-card: 8px 8px 16px 0 rgba(0, 0, 0, 0.1), -8px -8px 16px 0 rgba(255, 255, 255, 0.8), inset 6px 6px 10px 0 rgba(0, 0, 0, 0.02), inset -6px -6px 10px 0 rgba(255, 255, 255, 0.6);
-    --shadow-clay-btn: 6px 6px 12px 0 rgba(136, 141, 221, 0.4), -6px -6px 12px 0 rgba(255, 255, 255, 0.8), inset 4px 4px 8px 0 rgba(0, 0, 0, 0.05), inset -4px -4px 8px 0 rgba(255, 255, 255, 0.2);
+    --shadow-clay-card: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --shadow-clay-btn: 0 8px 24px rgba(168, 174, 245, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --shadow-clay-hover: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
 /* Custom Utilities */
 .clay-card {
-    @apply bg-white/80 backdrop-blur-md rounded-3xl border border-white/40 shadow-clay-card;
+    @apply bg-card-bg rounded-3xl border border-slate-700 shadow-clay-card hover:shadow-clay-hover transition-all;
 }
 
 .clay-btn {
-    @apply bg-periwinkle text-white font-bold rounded-full shadow-clay-btn transition-transform hover:scale-105 active:scale-95;
+    @apply bg-periwinkle text-charcoal font-bold rounded-full shadow-clay-btn transition-transform hover:scale-105 active:scale-95;
 }
 
 body {
-    @apply bg-off-white text-slate-800;
+    @apply bg-charcoal text-off-white;
 }

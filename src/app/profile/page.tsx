@@ -20,20 +20,20 @@ export default async function ProfilePage() {
 
     if (!dbUser) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-off-white">
-                <p className="text-slate-500 font-bold lowercase italic">user profile not found in database.</p>
+            <div className="min-h-screen flex items-center justify-center bg-charcoal">
+                <p className="text-slate-light font-bold lowercase italic">perfil não encontrado na base de dados.</p>
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen pb-20 pt-8 bg-off-white">
+        <main className="min-h-screen pb-20 pt-8 bg-charcoal">
             <div className="max-w-4xl mx-auto px-4 md:px-8">
                 <div className="clay-card overflow-hidden">
                     {/* Cover / Header Area */}
                     <div className="h-48 bg-periwinkle/10 relative">
                         <div className="absolute -bottom-16 left-10">
-                            <div className="w-32 h-32 rounded-full border-8 border-white bg-white shadow-2xl overflow-hidden relative group">
+                            <div className="w-32 h-32 rounded-full border-8 border-slate-700 bg-card-bg shadow-2xl overflow-hidden relative group">
                                 {dbUser.image ? (
                                     <img src={dbUser.image} alt={dbUser.name} className="w-full h-full object-cover" />
                                 ) : (
@@ -54,58 +54,58 @@ export default async function ProfilePage() {
                                 <h1 className="text-4xl font-black lowercase tracking-tighter mb-1">
                                     {dbUser.name}
                                 </h1>
-                                <p className="text-slate-500 font-medium lowercase">
-                                    {dbUser.role} • member since {new Date(dbUser.created_at).toLocaleDateString()}
+                                <p className="text-slate-light font-medium lowercase">
+                                    {dbUser.role} • membro desde {new Date(dbUser.created_at).toLocaleDateString()}
                                 </p>
                             </div>
-                            <button className="clay-btn px-8 py-3 lowercase">edit profile</button>
+                            <button className="clay-btn px-8 py-3 lowercase">editar perfil</button>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-6">
-                                <h3 className="text-lg font-black lowercase tracking-tight">personal details</h3>
+                                <h3 className="text-lg font-black lowercase tracking-tight">detalhes pessoais</h3>
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-4 text-slate-600">
-                                        <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                                    <div className="flex items-center gap-4 text-slate-light">
+                                        <div className="w-10 h-10 rounded-2xl bg-card-bg border border-slate-700 flex items-center justify-center shadow-sm">
                                             <Mail className="w-5 h-5 text-periwinkle" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">email</p>
+                                            <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">email</p>
                                             <p className="font-bold lowercase">{dbUser.email}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4 text-slate-600">
-                                        <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                                    <div className="flex items-center gap-4 text-slate-light">
+                                        <div className="w-10 h-10 rounded-2xl bg-card-bg border border-slate-700 flex items-center justify-center shadow-sm">
                                             <MapPin className="w-5 h-5 text-periwinkle" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">location</p>
-                                            <p className="font-bold lowercase">{dbUser.location || 'not set'}</p>
+                                            <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">localização</p>
+                                            <p className="font-bold lowercase">{dbUser.location || 'não definido'}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-6">
-                                <h3 className="text-lg font-black lowercase tracking-tight">account status</h3>
+                                <h3 className="text-lg font-black lowercase tracking-tight">estado da conta</h3>
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-4 text-slate-600">
-                                        <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                                    <div className="flex items-center gap-4 text-slate-light">
+                                        <div className="w-10 h-10 rounded-2xl bg-card-bg border border-slate-700 flex items-center justify-center shadow-sm">
                                             <Shield className="w-5 h-5 text-emerald-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">verification</p>
+                                            <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">verificação</p>
                                             <p className="font-bold lowercase">
-                                                {dbUser.is_verified ? 'verified account' : 'community member'}
+                                                {dbUser.is_verified ? 'conta verificada' : 'membro da comunidade'}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4 text-slate-600">
-                                        <div className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
-                                            <Calendar className="w-5 h-5 text-slate-400" />
+                                    <div className="flex items-center gap-4 text-slate-light">
+                                        <div className="w-10 h-10 rounded-2xl bg-card-bg border border-slate-700 flex items-center justify-center shadow-sm">
+                                            <Calendar className="w-5 h-5 text-slate-lighter" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">id</p>
+                                            <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">id</p>
                                             <p className="font-bold lowercase">#00{dbUser.id}</p>
                                         </div>
                                     </div>
@@ -114,9 +114,9 @@ export default async function ProfilePage() {
                         </div>
 
                         <div className="mt-12 p-6 bg-periwinkle/5 rounded-3xl border-2 border-dashed border-periwinkle/20">
-                            <p className="text-center text-sm font-medium text-slate-500 lowercase italic">
-                                your profile data is securely synced between your google account and our curated database.
-                                any changes to your google name or picture will automatically update here next time you sign in.
+                            <p className="text-center text-sm font-medium text-slate-light lowercase italic">
+                                os teus dados estão seguros e sincronizados entre a tua conta google e a nossa base de dados.
+                                qualquer alteração ao teu nome ou foto de perfil no google irá atualizar automaticamente aqui.
                             </p>
                         </div>
                     </div>

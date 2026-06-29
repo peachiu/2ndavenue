@@ -73,8 +73,8 @@ export default function ProductFeed() {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className={`px-5 py-2 rounded-full font-bold text-sm transition-all ${activeCategory === cat
-                                    ? 'bg-periwinkle text-white shadow-clay-btn scale-105'
-                                    : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-periwinkle border border-slate-100'
+                                    ? 'bg-periwinkle text-charcoal shadow-clay-btn scale-105'
+                                    : 'bg-card-bg text-slate-light hover:bg-hover-bg hover:text-periwinkle border border-slate-700'
                                     }`}
                             >
                                 {t(`cat.${cat}`)}
@@ -92,12 +92,12 @@ export default function ProductFeed() {
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="flex items-center gap-2 px-6 py-3 bg-white rounded-full font-bold text-slate-600 shadow-sm border border-slate-100"
+                        className="flex items-center gap-2 px-6 py-3 bg-card-bg rounded-full font-bold text-slate-light shadow-sm border border-slate-700"
                     >
                         <Filter className="w-4 h-4" />
                         <span>{t("feed.filters")}</span>
                     </motion.button>
-                    <div className="px-6 py-3 bg-white rounded-full font-bold text-slate-600 shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className="px-6 py-3 bg-card-bg rounded-full font-bold text-slate-light shadow-sm border border-slate-700 flex items-center gap-2">
                         <span>{t("feed.sort")}:</span>
                         <span className="text-periwinkle capitalize">{t("feed.sort.newest")}</span>
                     </div>

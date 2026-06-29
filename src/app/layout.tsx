@@ -29,7 +29,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${outfit.variable} font-sans bg-off-white text-slate-800 antialiased selection:bg-periwinkle selection:text-white`}
+                className={`${outfit.variable} font-sans bg-charcoal text-off-white antialiased selection:bg-periwinkle selection:text-charcoal`}
             >
                 <Providers>
                     <div className="flex flex-col min-h-screen">

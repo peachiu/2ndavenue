@@ -1,10 +1,13 @@
 "use client";
 
 import ProductFeed from "@/components/ProductFeed";
+import { useTranslation } from "@/context/TranslationContext";
 
 export default function FeedPage() {
+    const { t } = useTranslation();
+
     return (
-        <main className="min-h-screen pb-20 pt-12 bg-off-white">
+        <main className="min-h-screen pb-20 pt-12 bg-charcoal">
             <div className="max-w-7xl mx-auto">
                 {/* 
                   We removed the redundant local Navbar and 'Discover Everything' header 
@@ -16,7 +19,7 @@ export default function FeedPage() {
                 {/* Secondary Actions */}
                 <div className="text-center pb-20">
                     <button className="clay-btn px-10 py-4 text-lg lowercase">
-                        load more items
+                        {t("load_more")}
                     </button>
                 </div>
             </div>

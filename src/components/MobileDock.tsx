@@ -21,7 +21,7 @@ export default function MobileDock() {
 
     return (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden w-[90%] max-w-[400px]">
-            <div className="bg-slate-900/95 backdrop-blur-xl rounded-full p-2 flex items-center justify-between shadow-2xl border border-white/10 px-4">
+            <div className="bg-card-bg/95 backdrop-blur-xl rounded-full p-2 flex items-center justify-between shadow-2xl border border-slate-700 px-4">
                 {DOCK_ITEMS.map((item) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
@@ -32,7 +32,7 @@ export default function MobileDock() {
                                 <motion.button
                                     whileTap={{ scale: 1.2 }}
                                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                                    className="bg-periwinkle p-4 rounded-full shadow-lg shadow-periwinkle/30 border-2 border-white/20 -mt-8"
+                                    className="bg-periwinkle p-4 rounded-full shadow-lg shadow-periwinkle/30 border-2 border-slate-lighter -mt-8"
                                 >
                                     <Icon className="w-6 h-6 text-white" />
                                 </motion.button>
@@ -45,7 +45,7 @@ export default function MobileDock() {
                             <motion.button
                                 whileTap={{ scale: 1.2 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                                className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition-colors ${isActive ? 'text-periwinkle' : 'text-slate-400'
+                                className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition-colors ${isActive ? 'text-periwinkle' : 'text-slate-lighter'
                                     }`}
                             >
                                 <Icon className="w-5 h-5" />
