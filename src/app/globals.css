@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-    --color-charcoal: #0a0a0a;
-    --color-card-bg: #1a1a1a;
+    --color-charcoal: #121212;
+    --color-card-bg: #1d1d1d;
     --color-off-white: #e5e5e5;
     --color-slate-light: #a0a0a0;
-    --color-slate-lighter: #c8c8c8;
-    --color-periwinkle: #a8aef5;
+    --color-slate-lighter: #d2d2d2;
+    --color-periwinkle: #5170ff;
     --color-border-dark: #2a2a2a;
     --color-hover-bg: #252525;
 
@@ -27,3 +27,4 @@
 body {
     @apply bg-charcoal text-off-white;
 }
+

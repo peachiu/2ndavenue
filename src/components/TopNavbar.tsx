@@ -1,13 +1,91 @@
 "use client";
 
 import Link from "next/link";
-import { Search } from "lucide-react";
-import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import {
+    Search, Shirt, Footprints, Watch, Monitor,
+    Sofa, Car, Trophy, BookOpen, Palette, Baby,
+    Sparkles, PawPrint, Package, Heart, X, type LucideIcon
+} from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import UserNav from "./UserNav";
-import { useTranslation } from "@/context/TranslationContext";
+
+// Map icon names from DB to Lucide components
+const iconMap: Record<string, LucideIcon> = {
+    Shirt, Footprints, Watch, Monitor, Sofa, Car,
+    Trophy, BookOpen, Palette, Baby, Sparkles, PawPrint, Package,
+};
+
+interface Category {
+    id: number;
+    slug: string;
+    name_pt: string;
+    name_en: string;
+    icon: string;
+    parent_id: number | null;
+    sort_order: number;
+}
 
 export default function TopNavbar() {
-    const { t } = useTranslation();
+    const router = useRouter();
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const inputRef = useRef<HTMLInputElement>(null);
+    const searchContainerRef = useRef<HTMLFormElement>(null);
+
+    useEffect(() => {
+        fetch('/api/categories?parent_id=null')
+            .then(res => res.json())
+            .then(data => setCategories(data.slice(0, 4))) // Show first 4
+            .catch(() => {});
+    }, []);
+
+    // Focus input when search opens
+    useEffect(() => {
+        if (searchOpen && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [searchOpen]);
+
+    // Close search on click outside
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+                setSearchOpen(false);
+                setSearchQuery("");
+            }
+        };
+        if (searchOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [searchOpen]);
+
+    const handleSearchIcon = () => {
+        if (searchOpen) {
+            // Second click → execute search
+            const q = searchQuery.trim();
+            if (q) {
+                router.push(`/search?q=${encodeURIComponent(q)}`);
+                setSearchQuery("");
+                setSearchOpen(false);
+            }
+        } else {
+            // First click → open search bar
+            setSearchOpen(true);
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const q = searchQuery.trim();
+        if (q) {
+            router.push(`/search?q=${encodeURIComponent(q)}`);
+            setSearchQuery("");
+            setSearchOpen(false);
+        }
+    };
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-card-bg/90 backdrop-blur-md border-b border-slate-700">
@@ -15,31 +93,83 @@ export default function TopNavbar() {
                 {/* Left: Floating Logo */}
                 <Link href="/" className="flex items-center gap-3 group">
                     <div className="h-10 w-10 bg-periwinkle rounded-2xl flex items-center justify-center shadow-clay-card group-hover:shadow-clay-hover group-hover:-rotate-2 transition-all duration-300">
-                        <span className="text-charcoal font-black text-2xl lowercase leading-none pb-[4px]">s</span>
+                        <span className="text-off-white font-black text-2xl leading-[0] -translate-y-1">s</span>
                     </div>
                     <span className="text-xl font-black tracking-tighter text-off-white lowercase hidden sm:block">
                         secondavenue
                     </span>
                 </Link>
 
-                {/* Center: Desktop Links */}
+                {/* Center: Desktop Links (dynamic from DB) */}
                 <div className="hidden md:flex items-center gap-8 translate-x-4">
-                    {['tech', 'apparel', 'home'].map((cat) => (
-                        <Link
-                            key={cat}
-                            href={`/feed?cat=${cat}`}
-                            className="text-sm font-bold text-slate-light hover:text-periwinkle transition-all lowercase"
-                        >
-                            {t(`cat.${cat}`)}
-                        </Link>
-                    ))}
+                    {categories.map((cat) => {
+                        const IconComponent = iconMap[cat.icon];
+                        return (
+                            <Link
+                                key={cat.id}
+                                href={`/feed?cat=${cat.slug}`}
+                                className="text-sm font-bold text-slate-light hover:text-periwinkle transition-all flex items-center gap-1.5"
+                            >
+                                {IconComponent && <IconComponent className="w-4 h-4" />}
+                                {cat.name_pt}
+                            </Link>
+                        );
+                    })}
+                    <Link
+                        href="/feed"
+                        className="text-sm font-bold text-periwinkle hover:text-off-white transition-all"
+                    >
+                        Ver tudo
+                    </Link>
                 </div>
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2 md:gap-4">
-                    <button className="p-3 text-slate-lighter hover:text-periwinkle hover:bg-hover-bg rounded-2xl transition-all">
-                        <Search className="w-5 h-5" />
-                    </button>
+                    {/* Expandable search */}
+                    <form onSubmit={handleSubmit} ref={searchContainerRef}>
+                        <div className="relative flex items-center">
+                            <button
+                                type="button"
+                                onClick={handleSearchIcon}
+                                className={`p-3 rounded-2xl transition-all ${
+                                    searchOpen
+                                        ? 'text-periwinkle bg-hover-bg'
+                                        : 'text-slate-lighter hover:text-periwinkle hover:bg-hover-bg'
+                                }`}
+                                aria-label="Pesquisar"
+                            >
+                                <Search className="w-5 h-5" />
+                            </button>
+                            <div className={`relative transition-all duration-300 ease-in-out overflow-hidden ${
+                                searchOpen ? 'opacity-100 w-48 md:w-64 ml-2' : 'opacity-0 w-0 ml-0'
+                            }`}>
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Escape' && (setSearchOpen(false), setSearchQuery(''))}
+                                    placeholder="Pesquisar..."
+                                    className="w-full bg-card-bg text-off-white placeholder-slate-lighter rounded-2xl py-2 pl-4 pr-10 text-sm font-medium border border-slate-700 focus:outline-none focus:border-periwinkle"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchQuery('')}
+                                        className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-lighter hover:text-off-white transition-colors"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </form>
+
+                    <Link href="/favorites">
+                        <button className="p-3 text-slate-lighter hover:text-rose-400 hover:bg-hover-bg rounded-2xl transition-all">
+                            <Heart className="w-5 h-5" />
+                        </button>
+                    </Link>
                     <UserNav />
                 </div>
             </div>

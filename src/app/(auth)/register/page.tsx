@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { useTranslation } from "@/context/TranslationContext";
+import { signIn, useSession } from "next-auth/react";
+import { User, Mail, Lock, UserPlus, LogIn } from "lucide-react";
 
 export default function RegisterPage() {
+    const { data: session, status } = useSession();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -14,7 +15,15 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
-    const { t } = useTranslation();
+
+    // Redirect if already authenticated (after OAuth redirect back)
+    useEffect(() => {
+        if (status === "authenticated" && session?.user?.name) {
+            sessionStorage.setItem("toast", `sessão iniciada como ${session.user.name}`);
+            router.push("/");
+            router.refresh();
+        }
+    }, [status, session, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,12 +44,12 @@ export default function RegisterPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.message || t("error_message"));
+                setError(data.message || "algo correu mal");
             } else {
                 router.push("/login?registered=true");
             }
         } catch (err) {
-            setError(t("error_message"));
+            setError("algo correu mal");
         } finally {
             setIsLoading(false);
         }
@@ -49,31 +58,37 @@ export default function RegisterPage() {
     return (
         <div className="space-y-8">
             <div className="text-center lg:text-left">
-                <h1 className="text-5xl font-black lowercase tracking-tighter mb-2">{t("create_account")}</h1>
-                <p className="text-slate-light font-medium">{t("start_your_journey")}</p>
+                <h1 className="text-5xl font-black tracking-tighter mb-2">Criar conta</h1>
+                <p className="text-slate-light font-medium">conhece o teu website favorito.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="clay-card p-10 space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-bold text-off-white ml-1 lowercase">{t("first_name")}</label>
+                        <label className="text-sm font-bold text-off-white ml-1 flex items-center gap-1.5">
+                            <User className="w-3.5 h-3.5 text-periwinkle" />
+                            Primeiro nome
+                        </label>
                         <input
                             type="text"
                             required
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
-                            placeholder="jane"
+                            placeholder="Nome"
                             className="w-full bg-hover-bg px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-lighter font-medium text-off-white shadow-inner"
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-bold text-off-white ml-1 lowercase">{t("last_name")}</label>
+                        <label className="text-sm font-bold text-off-white ml-1 flex items-center gap-1.5">
+                            <User className="w-3.5 h-3.5 text-periwinkle" />
+                            Último nome
+                        </label>
                         <input
                             type="text"
                             required
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
-                            placeholder="doe"
+                            placeholder="Apelido"
                             className="w-full bg-hover-bg px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-lighter font-medium text-off-white shadow-inner"
                         />
                     </div>
@@ -81,18 +96,24 @@ export default function RegisterPage() {
 
                 <div className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-bold text-off-white ml-1 lowercase">{t("email")}</label>
+                        <label className="text-sm font-bold text-off-white ml-1 flex items-center gap-1.5">
+                            <Mail className="w-3.5 h-3.5 text-periwinkle" />
+                            Email
+                        </label>
                         <input
                             type="email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="you@example.com"
+                            placeholder="oteu@email.com"
                             className="w-full bg-hover-bg px-5 py-4 rounded-3xl border-2 border-transparent focus:border-periwinkle focus:outline-none transition-all placeholder:text-slate-lighter font-medium text-off-white shadow-inner"
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-bold text-off-white ml-1 lowercase">{t("password")}</label>
+                        <label className="text-sm font-bold text-off-white ml-1 flex items-center gap-1.5">
+                            <Lock className="w-3.5 h-3.5 text-periwinkle" />
+                            Palavra-passe
+                        </label>
                         <input
                             type="password"
                             required
@@ -111,22 +132,22 @@ export default function RegisterPage() {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="clay-btn w-full py-5 text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="clay-btn w-full py-5 text-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                    {isLoading ? t("creating_account") : t("sign_up")}
+                    {isLoading ? "A criar conta..." : <><UserPlus className="w-5 h-5" /> Cria conta</>}
                 </button>
 
                 <div className="relative py-2">
                     <div className="absolute inset-0 flex items-center gap-4">
                         <span className="w-full border-t border-slate-700" />
-                        <span className="text-xs lowercase font-bold text-slate-lighter whitespace-nowrap">or join with</span>
+                        <span className="text-xs font-bold text-slate-lighter whitespace-nowrap">Ou continua com</span>
                         <span className="w-full border-t border-slate-700" />
                     </div>
                 </div>
 
                 <button
                     type="button"
-                    onClick={() => signIn("google")}
+                    onClick={() => signIn("google", { callbackUrl: "/" })}
                     className="w-full py-4 rounded-full border-2 border-slate-700 font-bold text-off-white hover:bg-hover-bg transition-colors flex items-center justify-center gap-3 bg-card-bg"
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -135,12 +156,12 @@ export default function RegisterPage() {
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
-                    <span className="font-medium text-sm">{t("join_with_google")}</span>
+                    <span className="font-medium text-sm">Entra com a Conta Google</span>
                 </button>
             </form>
 
-            <p className="text-center text-slate-500 font-medium lowercase">
-                {t("already_have_account")} <Link href="/login" className="text-periwinkle font-bold hover:underline">{t("sign_in")}</Link>
+            <p className="text-center text-slate-500 font-medium">
+                Já tens conta? <Link href="/login" className="text-periwinkle font-bold hover:underline inline-flex items-center gap-1"><LogIn className="w-4 h-4" /> Entra</Link>
             </p>
         </div>
     );

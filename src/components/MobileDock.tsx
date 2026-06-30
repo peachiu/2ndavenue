@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Home, Grid, Plus, MessageCircle, User } from "lucide-react";
+import { Home, Heart, Plus, MessageCircle, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const DOCK_ITEMS = [
     { icon: Home, label: "home", href: "/" },
-    { icon: Grid, label: "browse", href: "#discover" },
+    { icon: Heart, label: "favoritos", href: "/favorites" },
     { icon: Plus, label: "sell", href: "/create-listing", primary: true },
     { icon: MessageCircle, label: "chat", href: "/messages" },
     { icon: User, label: "profile", href: "/dashboard" },

@@ -11,12 +11,41 @@ export default async function ProfilePage() {
         redirect("/login");
     }
 
-    // Fetch full user data from DB to verify the link
+    // Fetch full user data from DB
     const [rows] = await pool.query(
         'SELECT id, name, email, image, role, location, is_verified, created_at FROM users WHERE email = ?',
         [session.user?.email]
     );
     const dbUser = (rows as any[])[0];
+
+    // Fetch follow stats
+    const [followersRows] = await pool.query(
+        `SELECT u.id, u.name, u.image,
+                (SELECT COUNT(*) FROM follows f2 WHERE f2.follower_id = u.id AND f2.following_id = ?) AS follows_back
+         FROM follows f
+         JOIN users u ON f.follower_id = u.id
+         WHERE f.following_id = ?
+         ORDER BY f.created_at DESC`,
+        [dbUser?.id, dbUser?.id]
+    );
+    const followers = followersRows as any[];
+
+    const [followingRows] = await pool.query(
+        `SELECT u.id, u.name, u.image,
+                (SELECT COUNT(*) FROM follows f2 WHERE f2.follower_id = ? AND f2.following_id = u.id) AS follows_back
+         FROM follows f
+         JOIN users u ON f.following_id = u.id
+         WHERE f.follower_id = ?
+         ORDER BY f.created_at DESC`,
+        [dbUser?.id, dbUser?.id]
+    );
+    const following = followingRows as any[];
+
+    // Friends = mutual follows
+    const friendIds = followers
+        .filter(f => (f as any).follows_back > 0)
+        .map(f => (f as any).id);
+    const friends = followers.filter(f => friendIds.includes((f as any).id));
 
     if (!dbUser) {
         return (
@@ -27,7 +56,7 @@ export default async function ProfilePage() {
     }
 
     return (
-        <main className="min-h-screen pb-20 pt-8 bg-charcoal">
+        <main className="min-h-screen pb-20 pt-8 bg-charcoal select-none">
             <div className="max-w-4xl mx-auto px-4 md:px-8">
                 <div className="clay-card overflow-hidden">
                     {/* Cover / Header Area */}
@@ -37,7 +66,7 @@ export default async function ProfilePage() {
                                 {dbUser.image ? (
                                     <img src={dbUser.image} alt={dbUser.name} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-periwinkle/5 text-periwinkle text-4xl font-black lowercase">
+                                    <div className="w-full h-full flex items-center justify-center bg-periwinkle/5 text-periwinkle text-4xl font-black">
                                         {dbUser.name?.[0] || 'u'}
                                     </div>
                                 )}
@@ -51,11 +80,11 @@ export default async function ProfilePage() {
                     <div className="pt-20 pb-10 px-10">
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                             <div>
-                                <h1 className="text-4xl font-black lowercase tracking-tighter mb-1">
+                                <h1 className="text-4xl font-black tracking-tighter mb-1">
                                     {dbUser.name}
                                 </h1>
-                                <p className="text-slate-light font-medium lowercase">
-                                    {dbUser.role} • membro desde {new Date(dbUser.created_at).toLocaleDateString()}
+                                <p className="text-slate-light font-medium">
+                                    {dbUser.role === 'professional' ? 'Profissional' : 'Comunidade'} • membro desde {new Date(dbUser.created_at).toLocaleDateString()}
                                 </p>
                             </div>
                             <button className="clay-btn px-8 py-3 lowercase">editar perfil</button>
@@ -71,7 +100,7 @@ export default async function ProfilePage() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">email</p>
-                                            <p className="font-bold lowercase">{dbUser.email}</p>
+                                            <p className="font-bold">{dbUser.email}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4 text-slate-light">
@@ -80,7 +109,7 @@ export default async function ProfilePage() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">localização</p>
-                                            <p className="font-bold lowercase">{dbUser.location || 'não definido'}</p>
+                                            <p className="font-bold">{dbUser.location || 'não definido'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -95,7 +124,7 @@ export default async function ProfilePage() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">verificação</p>
-                                            <p className="font-bold lowercase">
+                                            <p className="font-bold">
                                                 {dbUser.is_verified ? 'conta verificada' : 'membro da comunidade'}
                                             </p>
                                         </div>
@@ -106,10 +135,98 @@ export default async function ProfilePage() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">id</p>
-                                            <p className="font-bold lowercase">#00{dbUser.id}</p>
+                                            <p className="font-bold">#00{dbUser.id}</p>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Followers / Following / Friends */}
+                        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Seguidores */}
+                            <div className="clay-card p-6">
+                                <h3 className="text-sm font-black uppercase tracking-widest text-slate-lighter mb-4">
+                                    seguidores <span className="text-periwinkle">({followers.length})</span>
+                                </h3>
+                                {followers.length === 0 ? (
+                                    <p className="text-sm text-slate-light italic lowercase">ainda sem seguidores</p>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {followers.map((f: any) => (
+                                            <div key={f.id} className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-hover-bg flex items-center justify-center overflow-hidden text-xs font-bold text-slate-lighter flex-shrink-0">
+                                                    {f.image ? (
+                                                        <img src={f.image} alt={f.name} className="w-full h-full object-cover" draggable={false} />
+                                                    ) : (
+                                                        f.name?.[0] || 'u'
+                                                    )}
+                                                </div>
+                                                <span className="text-sm font-bold text-off-white truncate">
+                                                    {f.name}
+                                                    {friendIds.includes(f.id) && (
+                                                        <span className="text-periwinkle text-xs ml-1.5">⭐ amigo</span>
+                                                    )}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* A seguir */}
+                            <div className="clay-card p-6">
+                                <h3 className="text-sm font-black uppercase tracking-widest text-slate-lighter mb-4">
+                                    a seguir <span className="text-periwinkle">({following.length})</span>
+                                </h3>
+                                {following.length === 0 ? (
+                                    <p className="text-sm text-slate-light italic lowercase">não segues ninguém</p>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {following.map((f: any) => (
+                                            <div key={f.id} className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-hover-bg flex items-center justify-center overflow-hidden text-xs font-bold text-slate-lighter flex-shrink-0">
+                                                    {f.image ? (
+                                                        <img src={f.image} alt={f.name} className="w-full h-full object-cover" draggable={false} />
+                                                    ) : (
+                                                        f.name?.[0] || 'u'
+                                                    )}
+                                                </div>
+                                                <span className="text-sm font-bold text-off-white truncate">
+                                                    {f.name}
+                                                    {(f as any).follows_back > 0 && (
+                                                        <span className="text-periwinkle text-xs ml-1.5">⭐ amigo</span>
+                                                    )}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Amigos (mutual) */}
+                            <div className="clay-card p-6 border-periwinkle/30">
+                                <h3 className="text-sm font-black uppercase tracking-widest text-periwinkle mb-4">
+                                    amigos ⭐ <span className="text-slate-lighter">({friends.length})</span>
+                                </h3>
+                                {friends.length === 0 ? (
+                                    <p className="text-sm text-slate-light italic lowercase">segue pessoas para fazer amigos</p>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {friends.map((f: any) => (
+                                            <div key={f.id} className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-periwinkle/20 flex items-center justify-center overflow-hidden text-xs font-bold text-periwinkle flex-shrink-0">
+                                                    {f.image ? (
+                                                        <img src={f.image} alt={f.name} className="w-full h-full object-cover" draggable={false} />
+                                                    ) : (
+                                                        f.name?.[0] || 'u'
+                                                    )}
+                                                </div>
+                                                <span className="text-sm font-bold text-off-white truncate">{f.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

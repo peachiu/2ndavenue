@@ -7,16 +7,57 @@ interface Product {
     title: string;
     price: number;
     currency: string;
-    category: string;
     condition_rating: string;
     image_url: string;
 }
 
 interface ProductGridProps {
     products: Product[];
+    layout?: "grid" | "list" | "mosaic";
 }
 
-export default function ProductGrid({ products }: ProductGridProps) {
+export default function ProductGrid({ products, layout = "grid" }: ProductGridProps) {
+    // ── Grid layout (uniform squares) ──────────────────────
+    if (layout === "grid") {
+        return (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+                {products.map((product) => (
+                    <ProductCard
+                        key={product.id}
+                        id={product.id}
+                        title={product.title}
+                        price={product.price}
+                        currency={product.currency}
+                        image_url={product.image_url}
+                        condition={product.condition_rating}
+                        variant="grid"
+                    />
+                ))}
+            </div>
+        );
+    }
+
+    // ── List layout (horizontal rows) ──────────────────────
+    if (layout === "list") {
+        return (
+            <div className="flex flex-col gap-4">
+                {products.map((product) => (
+                    <ProductCard
+                        key={product.id}
+                        id={product.id}
+                        title={product.title}
+                        price={product.price}
+                        currency={product.currency}
+                        image_url={product.image_url}
+                        condition={product.condition_rating}
+                        variant="list"
+                    />
+                ))}
+            </div>
+        );
+    }
+
+    // ── Mosaic layout (bento / current) ────────────────────
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 grid-auto-flow-dense">
             <style jsx>{`
@@ -41,11 +82,13 @@ export default function ProductGrid({ products }: ProductGridProps) {
                 return (
                     <div key={product.id} className={spanClasses}>
                         <ProductCard
+                            id={product.id}
                             title={product.title}
                             price={product.price}
                             currency={product.currency}
                             image_url={product.image_url}
                             condition={product.condition_rating}
+                            variant="mosaic"
                         />
                     </div>
                 );

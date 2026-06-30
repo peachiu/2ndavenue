@@ -14,10 +14,15 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-    title: "secondavenue | curated chaos",
+    title: "SecondAvenue - A tua avenida favorita.",
     description: "a marketplace for the aesthetically inclined.",
     icons: {
-        icon: "/icon.png",
+        icon: [
+            {
+                url: `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%235170ff"/><text x="32" y="46" font-family="Inter,sans-serif" font-size="52" font-weight="900" fill="%23e5e5e5" text-anchor="middle">s</text></svg>`,
+                type: "image/svg+xml",
+            },
+        ],
     },
 };
 
@@ -29,7 +34,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${outfit.variable} font-sans bg-charcoal text-off-white antialiased selection:bg-periwinkle selection:text-charcoal`}
+                className={`${outfit.variable} font-sans bg-charcoal text-off-white antialiased selection:bg-periwinkle selection:text-charcoal select-none`}
             >
                 <Providers>
                     <div className="flex flex-col min-h-screen">

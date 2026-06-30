@@ -1,28 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslation } from "@/context/TranslationContext";
 
 export default function AuthLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const { t } = useTranslation();
 
     return (
         <div className="min-h-screen grid lg:grid-cols-2">
             <div className="hidden lg:flex bg-periwinkle flex-col justify-center p-12 relative overflow-hidden">
-                <div className="absolute top-12 left-12 h-16 w-16 bg-charcoal rounded-full flex items-center justify-center shadow-inner text-periwinkle font-black text-4xl leading-none pb-[4px]">
-                    s
+                <div className="absolute top-12 left-12 h-16 w-16 bg-charcoal rounded-full flex items-center justify-center shadow-inner">
+                    <span className="text-periwinkle font-black text-4xl leading-[0] -translate-y-1">s</span>
                 </div>
 
                 <div className="relative z-10 text-charcoal">
-                    <h2 className="text-7xl font-black lowercase tracking-tighter mb-6">
-                        {t("auth.join").split(".")[0]} <br /> <span className="opacity-50">aesthetic</span> <br /> chaos.
+                    <h2 className="text-7xl font-black tracking-tighter mb-6">
+                        A avenida que tem tudo para ti. <br /> <span className="opacity-50">pronto?</span> <br /> vamos começar.
                     </h2>
                     <p className="text-xl font-medium max-w-md opacity-80">
-                        {t("auth.join_sub")}
+                        Cria uma conta e começa a vender as tuas peças ou descobre o teu próximo must-have.
                     </p>
                 </div>
 
@@ -37,9 +35,11 @@ export default function AuthLayout({
 
                 <div className="mt-12 text-center lg:hidden">
                     <Link href="/" className="flex items-center gap-3 justify-center">
-                        <div className="h-10 w-10 bg-periwinkle rounded-full flex items-center justify-center shadow-inner text-charcoal font-black text-2xl leading-none pb-1">s</div>
+                        <div className="h-10 w-10 bg-periwinkle rounded-full flex items-center justify-center shadow-inner">
+                            <span className="text-charcoal font-black text-2xl leading-[0] -translate-y-1">s</span>
+                        </div>
                         <span className="text-xl font-black tracking-tight text-off-white lowercase">
-                            secondavenue
+                            SecondAvenue
                         </span>
                     </Link>
                 </div>
