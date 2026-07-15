@@ -52,6 +52,10 @@ web_modules/
 sa.pem
 *.pem
 
+# Environment files with secrets
+.env.production
+.env.local
+
 # Optional npm cache directory
 .npm
 
