@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         const userId = (session.user as any).id;
         const body = await request.json();
 
-        const { title, description, price, currency, category_id, condition_rating, size } = body;
+        const { title, description, price, currency, category_id, condition_rating, image_urls } = body;
 
         if (!title || !price || !category_id) {
             return NextResponse.json(
@@ -64,9 +64,10 @@ export async function POST(request: Request) {
             );
         }
 
+        // Insert the listing
         const [result] = await pool.query(
-            `INSERT INTO listings (user_id, title, description, price, currency, category_id, condition_rating, size, status, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW())`,
+            `INSERT INTO listings (user_id, title, description, price, currency, category_id, condition_rating, status, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 'active', NOW(), NOW())`,
             [
                 userId,
                 title,
@@ -74,12 +75,25 @@ export async function POST(request: Request) {
                 Number(price),
                 currency || "EUR",
                 Number(category_id),
-                condition_rating || "good",
-                size || null,
+                condition_rating || "Good",
             ]
         );
 
         const insertId = (result as any).insertId;
+
+        // Insert images into listing_images if provided
+        if (image_urls && Array.isArray(image_urls) && image_urls.length > 0) {
+            const imageValues = image_urls.map((url: string, index: number) => [
+                insertId,
+                url,
+                index === 0 ? 1 : 0, // first image is primary
+                index,
+            ]);
+            await pool.query(
+                "INSERT INTO listing_images (listing_id, url, is_primary, sort_order) VALUES ?",
+                [imageValues]
+            );
+        }
 
         return NextResponse.json(
             { success: true, id: insertId, message: "Anúncio criado com sucesso!" },

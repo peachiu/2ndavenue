@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
     Search, Shirt, Footprints, Watch, Monitor,
     Sofa, Car, Trophy, BookOpen, Palette, Baby,
-    Sparkles, PawPrint, Package, Heart, X, type LucideIcon
+    Sparkles, PawPrint, Package, Heart, MessageCircle, X, type LucideIcon
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import UserNav from "./UserNav";
@@ -100,8 +100,8 @@ export default function TopNavbar() {
                     </span>
                 </Link>
 
-                {/* Center: Desktop Links (dynamic from DB) */}
-                <div className="hidden md:flex items-center gap-8 translate-x-4">
+                {/* Center: Desktop Links (dynamic from DB) — hide on tablet, show on lg+ */}
+                <div className="hidden lg:flex items-center gap-5 translate-x-4">
                     {categories.map((cat) => {
                         const IconComponent = iconMap[cat.icon];
                         return (
@@ -131,14 +131,14 @@ export default function TopNavbar() {
                             <button
                                 type="button"
                                 onClick={handleSearchIcon}
-                                className={`p-3 rounded-2xl transition-all ${
+                                className={`p-2 md:p-3 rounded-2xl transition-all ${
                                     searchOpen
                                         ? 'text-periwinkle bg-hover-bg'
                                         : 'text-slate-lighter hover:text-periwinkle hover:bg-hover-bg'
                                 }`}
                                 aria-label="Pesquisar"
                             >
-                                <Search className="w-5 h-5" />
+                                <Search className="w-4 h-4 md:w-5 md:h-5" />
                             </button>
                             <div className={`relative transition-all duration-300 ease-in-out overflow-hidden ${
                                 searchOpen ? 'opacity-100 w-48 md:w-64 ml-2' : 'opacity-0 w-0 ml-0'
@@ -166,8 +166,13 @@ export default function TopNavbar() {
                     </form>
 
                     <Link href="/favorites">
-                        <button className="p-3 text-slate-lighter hover:text-rose-400 hover:bg-hover-bg rounded-2xl transition-all">
-                            <Heart className="w-5 h-5" />
+                        <button className="p-2 md:p-3 text-slate-lighter hover:text-rose-400 hover:bg-hover-bg rounded-2xl transition-all">
+                            <Heart className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+                    </Link>
+                    <Link href="/messages">
+                        <button className="p-2 md:p-3 text-slate-lighter hover:text-periwinkle hover:bg-hover-bg rounded-2xl transition-all">
+                            <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
                     </Link>
                     <UserNav />

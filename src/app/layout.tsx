@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 
 import Footer from "@/components/Footer";
@@ -7,10 +7,10 @@ import TopNavbar from "@/components/TopNavbar";
 import MobileDock from "@/components/MobileDock";
 import { Providers } from "@/components/Providers";
 
-const outfit = Outfit({
+const manrope = Manrope({
     subsets: ["latin"],
-    variable: "--font-outfit",
-    weight: ["400", "500", "700", "900"],
+    variable: "--font-manrope",
+    weight: ["400", "500", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${outfit.variable} font-sans bg-charcoal text-off-white antialiased selection:bg-periwinkle selection:text-charcoal select-none`}
+                className={`${manrope.variable} font-sans bg-charcoal text-off-white antialiased selection:bg-periwinkle selection:text-charcoal select-none`}
             >
                 <Providers>
                     <div className="flex flex-col min-h-screen">
