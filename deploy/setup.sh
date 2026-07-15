@@ -5,13 +5,18 @@
 # MUST be run with bash, not sh!
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/peachiu/2ndavenue/main/deploy/setup.sh | bash -s -- --domain secondavenue.pt
+#   Direct SSL (DNS aponta para esta EC2):
+#     bash setup.sh --domain secondavenue.pt --email teu@email.com
+#
+#   Cloudflare Tunnel (recomendado):
+#     bash setup.sh --tunnel --domain secondavenue.pt
 #
 # Options:
-#   --domain     Your domain (e.g., secondavenue.pt) — enables SSL
-#   --email      Email for Let's Encrypt (required with --domain)
-#   --db-pass     MariaDB root password (auto-generated if omitted)
-#   --help        Show this help
+#   --domain     Your domain (e.g., secondavenue.pt)
+#   --email      Email for Let's Encrypt (required without --tunnel)
+#   --tunnel     Use Cloudflare Tunnel instead of direct SSL
+#   --db-pass    MariaDB root password (auto-generated if omitted)
+#   --help       Show this help
 # ============================================================
 
 set -euo pipefail
@@ -22,11 +27,14 @@ EMAIL=""
 DB_ROOT_PASS=""
 SKIP_SSL=false
 
+USE_TUNNEL=false
+
 while [ $# -gt 0 ]; do
     case "$1" in
         --domain) DOMAIN="$2"; shift 2 ;;
         --email)  EMAIL="$2"; shift 2 ;;
         --db-pass) DB_ROOT_PASS="$2"; shift 2 ;;
+        --tunnel) USE_TUNNEL=true; shift ;;
         --skip-ssl) SKIP_SSL=true; shift ;;
         --help)
             sed -n '/^# Usage:/,/^$/p' "$0" | sed 's/^# //'
@@ -36,9 +44,9 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -n "$DOMAIN" ] && [ -z "$EMAIL" ] && [ "$SKIP_SSL" = false ]; then
+if [ "$USE_TUNNEL" = false ] && [ -n "$DOMAIN" ] && [ -z "$EMAIL" ] && [ "$SKIP_SSL" = false ]; then
     echo "❌ --email is required when using --domain (for Let's Encrypt)"
-    echo "   Use --skip-ssl to skip SSL setup"
+    echo "   Use --tunnel or --skip-ssl to skip SSL setup"
     exit 1
 fi
 
@@ -125,10 +133,20 @@ ok "Repository ready."
 # STEP 5 — Environment file
 # ═══════════════════════════════════════════════════════════
 info "Creating .env.production..."
+
+# Determine NEXTAUTH_URL
+if [ "$USE_TUNNEL" = true ] && [ -n "$DOMAIN" ]; then
+    NEXT_URL="https://$DOMAIN"
+elif [ -n "$DOMAIN" ]; then
+    NEXT_URL="https://$DOMAIN"
+else
+    NEXT_URL="http://localhost:3000"
+fi
+
 cat > "$APP_DIR/.env.production" <<EOF
 # NextAuth
 NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-NEXTAUTH_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:3000}
+NEXTAUTH_URL=$NEXT_URL
 
 # Database
 DB_HOST=localhost
@@ -224,39 +242,122 @@ chown -R "$APP_USER:$APP_USER" "$APP_DIR/public/images"
 ok "Upload directory ready."
 
 # ═══════════════════════════════════════════════════════════
-# STEP 10 — nginx reverse proxy
+# STEP 10 — Reverse proxy (nginx + optional Cloudflare Tunnel)
 # ═══════════════════════════════════════════════════════════
-if [ -n "$DOMAIN" ]; then
-    info "Configuring nginx for $DOMAIN..."
 
-    cat > /etc/nginx/sites-available/2ndavenue <<NGINX
+# Common nginx config (proxies :3000 for both tunnel and direct modes)
+cat > /etc/nginx/sites-available/2ndavenue <<NGINX
+upstream 2ndavenue {
+    server 127.0.0.1:3000;
+    keepalive 64;
+}
+
 server {
     listen 80;
-    server_name $DOMAIN www.$DOMAIN;
+    server_name _;
 
-    # Redirect HTTP → HTTPS (except for Let's Encrypt)
-    location /.well-known/acme-challenge/ {
-        root /var/www/html;
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Gzip
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript image/svg+xml;
+    gzip_min_length 1000;
+
+    # Static assets — cache aggressively
+    location /_next/static {
+        alias $APP_DIR/.next/static;
+        expires 365d;
+        add_header Cache-Control "public, immutable";
     }
 
+    location /images/ {
+        alias $APP_DIR/public/images/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Everything else → Next.js
     location / {
-        return 301 https://\$host\$request_uri;
+        proxy_pass http://2ndavenue;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
     }
 }
 NGINX
 
-    ln -sf /etc/nginx/sites-available/2ndavenue /etc/nginx/sites-enabled/
-    nginx -t && systemctl reload nginx
+rm -f /etc/nginx/sites-enabled/default
+ln -sf /etc/nginx/sites-available/2ndavenue /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+ok "nginx reverse proxy ready (port 80 → Next.js :3000)."
 
-    if [ "$SKIP_SSL" = false ]; then
-        info "Requesting Let's Encrypt SSL..."
-        certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" \
-            --non-interactive --agree-tos --email "$EMAIL" \
-            --redirect
-        ok "SSL configured."
+# ── Cloudflare Tunnel ────────────────────────────────────
+if [ "$USE_TUNNEL" = true ]; then
+    info "Setting up Cloudflare Tunnel..."
+
+    # Install cloudflared
+    if ! command -v cloudflared &>/dev/null; then
+        curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o /tmp/cloudflared.deb
+        dpkg -i /tmp/cloudflared.deb 2>/dev/null || apt-get install -f -y -qq
+        rm /tmp/cloudflared.deb
     fi
 
-    # Replace HTTP redirect with full SSL config
+    # Create config directory
+    mkdir -p /etc/cloudflared
+
+    # Write config — tunnel points to nginx on port 80
+    cat > /etc/cloudflared/config.yml <<YML
+tunnel: $DOMAIN
+credentials-file: /etc/cloudflared/$DOMAIN.json
+ingress:
+  - hostname: $DOMAIN
+    service: http://localhost:80
+  - hostname: www.$DOMAIN
+    service: http://localhost:80
+  - service: http_status:404
+YML
+
+    echo ""
+    echo -e "${YELLOW}══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${YELLOW}  ⚠️  CLOUDFLARE TUNNEL — AÇÃO NECESSÁRIA${NC}"
+    echo -e "${YELLOW}══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "  1. Autentica o cloudflared na Cloudflare:"
+    echo -e "     ${CYAN}cloudflared tunnel login${NC}"
+    echo ""
+    echo -e "  2. Cria o túnel (substitui pelo nome que quiseres):"
+    echo -e "     ${CYAN}cloudflared tunnel create secondavenue${NC}"
+    echo ""
+    echo -e "  3. Copia o ficheiro .json para /etc/cloudflared/:"
+    echo -e "     ${CYAN}cp ~/.cloudflared/*.json /etc/cloudflared/$DOMAIN.json${NC}"
+    echo ""
+    echo -e "  4. No DNS da Cloudflare, cria registos CNAME:"
+    echo -e "     ${CYAN}$DOMAIN  →  tunnel-name.cfargotunnel.com${NC}"
+    echo -e "     ${CYAN}www.$DOMAIN  →  tunnel-name.cfargotunnel.com${NC}"
+    echo ""
+    echo -e "  5. Instala como serviço:"
+    echo -e "     ${CYAN}cloudflared tunnel install secondavenue${NC}"
+    echo ""
+    echo -e "  Depois disto, o site fica disponível em:"
+    echo -e "     ${CYAN}https://$DOMAIN${NC}"
+    echo ""
+
+elif [ "$SKIP_SSL" = true ]; then
+    info "Skipping SSL (--skip-ssl). Site available on http://localhost:3000"
+    ok "nginx serving on port 80."
+
+elif [ -n "$DOMAIN" ]; then
+    info "Configuring Let's Encrypt SSL for $DOMAIN..."
+
+    # Temporarily switch to SSL-ready config
     cat > /etc/nginx/sites-available/2ndavenue <<NGINX
 upstream 2ndavenue {
     server 127.0.0.1:3000;
@@ -266,7 +367,14 @@ upstream 2ndavenue {
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
-    return 301 https://\$host\$request_uri;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
 }
 
 server {
@@ -317,36 +425,13 @@ server {
 NGINX
 
     nginx -t && systemctl reload nginx
-    ok "nginx fully configured with SSL."
-else
-    info "No domain provided — setting up nginx on port 80 without SSL."
-    cat > /etc/nginx/sites-available/2ndavenue <<NGINX
-upstream 2ndavenue {
-    server 127.0.0.1:3000;
-    keepalive 64;
-}
 
-server {
-    listen 80;
-    server_name _;
+    info "Requesting Let's Encrypt SSL..."
+    certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" \
+        --non-interactive --agree-tos --email "$EMAIL" \
+        --redirect || warn "SSL failed — DNS may not point here yet. Run 'certbot --nginx -d $DOMAIN -d www.$DOMAIN' later."
 
-    location / {
-        proxy_pass http://2ndavenue;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_cache_bypass \$http_upgrade;
-    }
-}
-NGINX
-
-    ln -sf /etc/nginx/sites-available/2ndavenue /etc/nginx/sites-enabled/
-    nginx -t && systemctl reload nginx
-    ok "nginx listening on port 80 → 2ndavenue on :3000."
+    ok "nginx + SSL configured for $DOMAIN."
 fi
 
 # ═══════════════════════════════════════════════════════════
@@ -362,21 +447,33 @@ echo -e "${GREEN}═════════════════════
 echo -e "${GREEN}  ✅ SecondAvenue deployed!${NC}"
 echo -e "${GREEN}════════════════════════════════════════════════${NC}"
 echo ""
-echo -e "  ${CYAN}App:${NC}        http://localhost:3000"
-if [ -n "$DOMAIN" ]; then
+echo -e "  ${CYAN}App local:${NC}  http://localhost:3000"
+echo -e "  ${CYAN}PM2:${NC}        pm2 status | pm2 logs 2ndavenue"
+echo -e "  ${CYAN}nginx:${NC}      http://$(curl -s ifconfig.me 2>/dev/null || echo '<IP_PÚBLICO>')"
+echo -e "  ${CYAN}DB:${NC}         mysql -u $DB_USER -p'$DB_ROOT_PASS' $DB_NAME"
+
+if [ "$USE_TUNNEL" = true ]; then
+    echo ""
+    echo -e "${YELLOW}  🌐 CLOUDFLARE TUNNEL — PRÓXIMOS PASSOS:${NC}"
+    echo -e "  1. ${CYAN}cloudflared tunnel login${NC}"
+    echo -e "  2. ${CYAN}cloudflared tunnel create secondavenue${NC}"
+    echo -e "  3. ${CYAN}cp ~/.cloudflared/*.json /etc/cloudflared/$DOMAIN.json${NC}"
+    echo -e "  4. No DNS Cloudflare: CNAME $DOMAIN → tunnel-name.cfargotunnel.com"
+    echo -e "  5. ${CYAN}cloudflared tunnel install secondavenue${NC}"
+    echo ""
+    echo -e "  🔗 Site final: ${CYAN}https://$DOMAIN${NC}"
+elif [ -n "$DOMAIN" ]; then
     echo -e "  ${CYAN}Domain:${NC}     https://$DOMAIN"
 fi
-echo -e "  ${CYAN}Process:${NC}     pm2 list (or pm2 logs 2ndavenue)"
-echo -e "  ${CYAN}DB root:${NC}     mysql -u root -p'$DB_ROOT_PASS'"
-echo -e "  ${CYAN}DB user:${NC}     mysql -u $DB_USER -p'$DB_ROOT_PASS' $DB_NAME"
+
 echo ""
 echo -e "${YELLOW}  ⚠️  NEXT STEPS:${NC}"
 echo -e "  1. Edit env vars:   nano $APP_DIR/.env.production"
 echo -e "  2. Add Google OAuth: uncomment GOOGLE_CLIENT_* and fill in"
 echo -e "  3. Restart app:      pm2 restart 2ndavenue"
-echo -e "  4. Deploy updates:   cd $APP_DIR && git pull && npm run build && pm2 restart 2ndavenue"
+echo -e "  4. Deploy updates:   cd $APP_DIR && ./deploy/deploy.sh"
 echo ""
 echo -e "${YELLOW}  🔐 SAVE THESE:${NC}"
-echo -e "  MariaDB root password: $DB_ROOT_PASS"
-echo -e "  NEXTAUTH_SECRET:       $NEXTAUTH_SECRET"
+echo -e "  MariaDB password:  $DB_ROOT_PASS"
+echo -e "  NEXTAUTH_SECRET:   $NEXTAUTH_SECRET"
 echo ""
