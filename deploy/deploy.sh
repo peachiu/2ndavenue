@@ -71,16 +71,11 @@ ok "Build complete."
 # ─── 5. Restart PM2 ───────────────────────────────────────
 info "Restarting PM2..."
 if command -v pm2 &>/dev/null; then
-    pm2 reload 2ndavenue 2>/dev/null || pm2 start npm --name "2ndavenue" -- run start 2>/dev/null || {
-        # If PM2 wasn't started yet, start fresh
-        export NODE_OPTIONS="--openssl-legacy-provider"
-        pm2 start npm --name "2ndavenue" \
-            --log-date-format "YYYY-MM-DD HH:mm Z" \
-            --output "$APP_DIR/logs/pm2-out.log" \
-            --error "$APP_DIR/logs/pm2-err.log" \
-            -- run start
-        pm2 save
-    }
+    if [ -f "$APP_DIR/ecosystem.config.cjs" ]; then
+        pm2 reload ecosystem.config.cjs 2>/dev/null || pm2 start ecosystem.config.cjs
+    else
+        pm2 reload 2ndavenue 2>/dev/null || pm2 start npm --name "2ndavenue" -- run start
+    fi
     ok "PM2 restarted."
 else
     warn "PM2 not found — start manually: npm start &"

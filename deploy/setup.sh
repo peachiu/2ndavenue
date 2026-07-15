@@ -167,9 +167,9 @@ ok "Database schema applied."
 # ═══════════════════════════════════════════════════════════
 # STEP 7 — Install dependencies & build
 # ═══════════════════════════════════════════════════════════
-info "Installing npm dependencies..."
+info "Installing npm dependencies (including cross-env)..."
 cd "$APP_DIR"
-npm install --omit=dev 2>&1 | tail -1
+npm install 2>&1 | tail -1
 
 info "Building Next.js..."
 export NODE_OPTIONS="--openssl-legacy-provider"
@@ -186,14 +186,31 @@ npm install -g pm2 2>&1 | tail -1
 # Kill any existing process
 pm2 delete 2ndavenue 2>/dev/null || true
 
-# Start
-export NODE_OPTIONS="--openssl-legacy-provider"
-pm2 start npm --name "2ndavenue" \
-    --start \
-    --log-date-format "YYYY-MM-DD HH:mm Z" \
-    --output "$APP_DIR/logs/pm2-out.log" \
-    --error "$APP_DIR/logs/pm2-err.log" \
-    -- run start
+# Create PM2 ecosystem file for reliable environment
+cat > "$APP_DIR/ecosystem.config.cjs" <<'EOF'
+module.exports = {
+    apps: [{
+        name: "2ndavenue",
+        script: "node_modules/next/dist/bin/next",
+        args: "start",
+        cwd: "APP_DIR_PLACEHOLDER",
+        env: {
+            NODE_ENV: "production",
+            NODE_OPTIONS: "--openssl-legacy-provider",
+            PORT: 3000
+        },
+        log_date_format: "YYYY-MM-DD HH:mm Z",
+        out_file: "APP_DIR_PLACEHOLDER/logs/pm2-out.log",
+        error_file: "APP_DIR_PLACEHOLDER/logs/pm2-err.log",
+        max_restarts: 10,
+        restart_delay: 4000
+    }]
+};
+EOF
+sed -i "s|APP_DIR_PLACEHOLDER|$APP_DIR|g" "$APP_DIR/ecosystem.config.cjs"
+
+# Start with ecosystem file
+pm2 start "$APP_DIR/ecosystem.config.cjs"
 
 pm2 save
 pm2 startup systemd -u root --hp /root 2>/dev/null | tail -1
