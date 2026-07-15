@@ -122,6 +122,8 @@ export const authOptions = {
         strategy: "jwt" as const,
     },
     secret: process.env.NEXTAUTH_SECRET,
+    // trustHost needed when behind nginx reverse proxy
+    trustHost: true,
 };
 
 const handler = NextAuth(authOptions);
