@@ -2,6 +2,8 @@
 # ============================================================
 # SecondAvenue — Debian EC2 Setup Script
 # ============================================================
+# MUST be run with bash, not sh!
+#
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/peachiu/2ndavenue/main/deploy/setup.sh | bash -s -- --domain secondavenue.pt
 #
@@ -20,7 +22,7 @@ EMAIL=""
 DB_ROOT_PASS=""
 SKIP_SSL=false
 
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
     case "$1" in
         --domain) DOMAIN="$2"; shift 2 ;;
         --email)  EMAIL="$2"; shift 2 ;;
@@ -93,11 +95,8 @@ fi
 info "Securing MariaDB..."
 service mariadb start
 
-# Set root password
-mysqladmin -u root password "$DB_ROOT_PASS" 2>/dev/null || true
-
-# Create database and user
-mysql -u root -p"$DB_ROOT_PASS" <<SQL
+# On Debian, root uses auth_socket — use sudo mysql
+sudo mysql <<SQL
 CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_ROOT_PASS';
 GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'localhost';
@@ -154,13 +153,13 @@ warn "   nano $APP_DIR/.env.production"
 # STEP 6 — Database schema
 # ═══════════════════════════════════════════════════════════
 info "Running database schema..."
-mysql -u "$DB_USER" -p"$DB_ROOT_PASS" "$DB_NAME" < "$APP_DIR/database.sql"
+sudo mysql "$DB_NAME" < "$APP_DIR/database.sql"
 if [ -f "$APP_DIR/update_db_schema.php" ]; then
     php "$APP_DIR/update_db_schema.php" 2>/dev/null || true
 fi
 if [ -f "$APP_DIR/seed.sql" ]; then
     info "Importing seed data..."
-    mysql -u "$DB_USER" -p"$DB_ROOT_PASS" "$DB_NAME" < "$APP_DIR/seed.sql" 2>/dev/null || true
+    sudo mysql "$DB_NAME" < "$APP_DIR/seed.sql" 2>/dev/null || true
 fi
 ok "Database schema applied."
 

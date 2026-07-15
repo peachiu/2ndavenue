@@ -56,8 +56,12 @@ if [ -f "$APP_DIR/database.sql" ]; then
     DB_PASSWORD="${DB_PASSWORD:-}"
     DB_NAME="${DB_NAME:-secondavenue}"
 
-    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" ${DB_PASSWORD:+-p"$DB_PASSWORD"} \
-        "$DB_NAME" < "$APP_DIR/database.sql" 2>/dev/null && \
+    if [ "$DB_HOST" = "localhost" ] || [ "$DB_HOST" = "127.0.0.1" ]; then
+        sudo mysql "$DB_NAME" < "$APP_DIR/database.sql" 2>/dev/null
+    else
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" ${DB_PASSWORD:+-p"$DB_PASSWORD"} \
+            "$DB_NAME" < "$APP_DIR/database.sql" 2>/dev/null
+    fi && \
         ok "Database schema applied." || \
         warn "Could not apply schema — check credentials in .env.production"
 fi
