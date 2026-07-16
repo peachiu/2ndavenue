@@ -195,7 +195,7 @@ export default function ProductFeed({ limit, showViewAll, simple, title }: Produ
             ) : (
                 <>
                     <ProductGrid products={displayProducts} layout={layout} />
-                    {showViewAll && products.length > (limit || Infinity) && (
+                    {showViewAll && limit && displayProducts.length >= limit && (
                         <div className="flex justify-end mt-8">
                             <Link
                                 href="/feed"
