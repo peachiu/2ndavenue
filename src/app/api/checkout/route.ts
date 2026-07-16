@@ -89,6 +89,15 @@ export async function POST(request: Request) {
             [itemValues]
         );
 
+        // Deactivate sold listings (mark as 'sold' so they disappear from feed/seller profile)
+        const listingIds = orderItemsData.map((item) => item.listing_id);
+        if (listingIds.length > 0) {
+            await pool.query(
+                "UPDATE listings SET status = 'sold', updated_at = NOW() WHERE id IN (?)",
+                [listingIds]
+            );
+        }
+
         // Send receipt email (async - don't block response)
         if (userEmail) {
             sendReceiptEmail(userEmail, userName, orderId, orderItemsData, total, currency, shipping)

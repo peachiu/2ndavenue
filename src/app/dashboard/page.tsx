@@ -30,15 +30,24 @@ export default async function DashboardPage() {
     const [statsRows] = await pool.query(
         `SELECT
             COUNT(*) AS total_listings,
-            COALESCE(SUM(price * COALESCE(stock, 1)), 0) AS total_value,
             COALESCE(SUM(views), 0) AS total_views
          FROM listings WHERE user_id = ?`,
         [userId]
     );
     const stats = (statsRows as any[])[0];
     const totalListings = Number(stats?.total_listings || 0);
-    const totalValue = Number(stats?.total_value || 0);
     const totalViews = Number(stats?.total_views || 0);
+
+    // Fetch actual revenue from completed orders (user as seller)
+    const [revenueRows] = await pool.query(
+        `SELECT COALESCE(SUM(oi.price * oi.quantity), 0) AS total_revenue
+         FROM order_items oi
+         JOIN listings l ON l.id = oi.listing_id
+         JOIN orders o ON o.id = oi.order_id
+         WHERE l.user_id = ? AND o.status NOT IN ('cancelled', 'refunded')`,
+        [userId]
+    );
+    const totalValue = Number((revenueRows as any[])[0]?.total_revenue || 0);
 
     // Fetch user's listings
     const [listingsRows] = await pool.query(

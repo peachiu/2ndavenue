@@ -25,7 +25,18 @@
     @apply bg-periwinkle text-charcoal font-bold rounded-full shadow-clay-btn transition-transform hover:scale-105 active:scale-95;
 }
 
+.clay-btn-secondary {
+    @apply bg-transparent text-periwinkle font-bold rounded-full border-2 border-periwinkle/40 transition-all hover:bg-periwinkle/10 hover:border-periwinkle active:scale-95;
+}
+
 body {
     @apply bg-charcoal text-off-white;
+}
+
+/* Mobile UI scale - slightly smaller text on small screens */
+@media (max-width: 767px) {
+    main {
+        font-size: 94%;
+    }
 }
 

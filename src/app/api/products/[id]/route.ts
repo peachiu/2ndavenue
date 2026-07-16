@@ -44,6 +44,10 @@ export async function GET(
         // Fetch tags (if tags table exists) — or return empty array
         let tags: string[] = [];
 
+        // Increment view count asynchronously (don't block response)
+        pool.query("UPDATE listings SET views = views + 1 WHERE id = ?", [id])
+            .catch((err) => console.error("Failed to increment view:", err));
+
         return NextResponse.json({
             ...product,
             images: (images as any[]).map((img) => img.url),

@@ -44,9 +44,11 @@ interface Product {
 interface ProductFeedProps {
     limit?: number;
     showViewAll?: boolean;
+    simple?: boolean;
+    title?: string;
 }
 
-export default function ProductFeed({ limit, showViewAll }: ProductFeedProps = {}) {
+export default function ProductFeed({ limit, showViewAll, simple, title }: ProductFeedProps = {}) {
     const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
@@ -83,9 +85,9 @@ export default function ProductFeed({ limit, showViewAll }: ProductFeedProps = {
     return (
         <section id="discover" className="max-w-7xl mx-auto px-4 md:px-8 mb-20 scroll-mt-32">
             {/* Header Content */}
-            <div className="mb-12 space-y-6">
-                <h2 className="text-5xl md:text-7xl font-black tracking-tighter animate-in">
-                    Descobre tudo
+            <div className="mb-8 md:mb-12 space-y-4 md:space-y-6">
+                <h2 className="text-3xl md:text-7xl font-black tracking-tighter animate-in">
+                    {title || "Descobre tudo"}
                 </h2>
                 <style jsx>{`
                     .animate-in {
@@ -97,86 +99,90 @@ export default function ProductFeed({ limit, showViewAll }: ProductFeedProps = {
                     }
                 `}</style>
 
-                {/* Row 1: Tudo + Layout switcher + Filters + Sort */}
-                <div className="flex flex-wrap items-center gap-3">
-                    <button
-                        onClick={() => setActiveCategoryId(null)}
-                        className={`px-5 py-2 rounded-full font-bold text-sm flex items-center gap-1.5 transition-all will-change-transform active:scale-95 ${
-                            activeCategoryId === null
-                                ? 'bg-periwinkle text-charcoal shadow-clay-btn'
-                                : 'bg-card-bg text-slate-light hover:bg-hover-bg hover:text-periwinkle border border-slate-700'
-                        }`}
-                    >
-                        <Grid3X3 className="w-4 h-4" />
-                        Tudo
-                    </button>
-
-                    <div className="flex items-center gap-3">
-                        {/* Layout switcher */}
-                        <div className="flex items-center gap-1 bg-card-bg rounded-full border border-slate-700 p-1">
-                            {[
-                                { key: "grid", icon: LayoutGrid, label: "Grelha" },
-                                { key: "list", icon: List, label: "Lista" },
-                                { key: "mosaic", icon: LayoutDashboard, label: "Mosaico" },
-                            ].map(({ key, icon: Icon, label }) => (
-                                <button
-                                    key={key}
-                                    onClick={() => setLayout(key as typeof layout)}
-                                    className={`px-3 py-1.5 rounded-full font-bold text-xs flex items-center gap-1.5 transition-all will-change-transform active:scale-95 ${
-                                        layout === key
-                                            ? "bg-periwinkle text-charcoal shadow-sm"
-                                            : "text-slate-light hover:text-periwinkle"
-                                    }`}
-                                    title={label}
-                                >
-                                    <Icon className="w-3.5 h-3.5" />
-                                    <span className="hidden sm:inline">{label}</span>
-                                </button>
-                            ))}
-                        </div>
-
-                        <button className="flex items-center gap-2 px-4 py-2 bg-card-bg rounded-full font-bold text-sm text-slate-light shadow-sm border border-slate-700 transition-all will-change-transform hover:brightness-110 active:scale-95">
-                            <Filter className="w-4 h-4" />
-                            <span className="hidden sm:inline">Filtros</span>
-                        </button>
-                        <div className="px-4 py-2 bg-card-bg rounded-full font-bold text-sm text-slate-light shadow-sm border border-slate-700 flex items-center gap-2 select-none">
-                            <span className="hidden sm:inline">Ordenar:</span>
-                            <span className="text-periwinkle capitalize text-xs sm:text-sm">Mais recente</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Row 2: Dynamic categories */}
-                <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    variants={{
-                        visible: { transition: { staggerChildren: 0.02 } },
-                    }}
-                    className="flex flex-wrap gap-2"
-                >
-                    {categories.map((cat) => {
-                        const IconComponent = iconMap[cat.icon];
-                        return (
-                            <motion.button
-                                key={cat.id}
-                                variants={{
-                                    hidden: { opacity: 0, y: 12 },
-                                    visible: { opacity: 1, y: 0 },
-                                }}
-                                transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                                onClick={() => setActiveCategoryId(cat.id)}
-                                className={`px-5 py-2 rounded-full font-bold text-sm flex items-center gap-1.5 will-change-transform ${activeCategoryId === cat.id
+                {!simple && (
+                    <>
+                    {/* Row 1: Tudo + Layout switcher + Filters + Sort */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <button
+                            onClick={() => setActiveCategoryId(null)}
+                            className={`px-5 py-2 rounded-full font-bold text-sm flex items-center gap-1.5 transition-all will-change-transform active:scale-95 ${
+                                activeCategoryId === null
                                     ? 'bg-periwinkle text-charcoal shadow-clay-btn'
                                     : 'bg-card-bg text-slate-light hover:bg-hover-bg hover:text-periwinkle border border-slate-700'
-                                    }`}
-                            >
-                                {IconComponent && <IconComponent className="w-4 h-4" />}
-                                {cat.name_pt}
-                            </motion.button>
-                        );
-                    })}
-                </motion.div>
+                            }`}
+                        >
+                            <Grid3X3 className="w-4 h-4" />
+                            Tudo
+                        </button>
+
+                        <div className="flex items-center gap-3">
+                            {/* Layout switcher */}
+                            <div className="flex items-center gap-1 bg-card-bg rounded-full border border-slate-700 p-1">
+                                {[
+                                    { key: "grid", icon: LayoutGrid, label: "Grelha" },
+                                    { key: "list", icon: List, label: "Lista" },
+                                    { key: "mosaic", icon: LayoutDashboard, label: "Mosaico" },
+                                ].map(({ key, icon: Icon, label }) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => setLayout(key as typeof layout)}
+                                        className={`px-3 py-1.5 rounded-full font-bold text-xs flex items-center gap-1.5 transition-all will-change-transform active:scale-95 ${
+                                            layout === key
+                                                ? "bg-periwinkle text-charcoal shadow-sm"
+                                                : "text-slate-light hover:text-periwinkle"
+                                        }`}
+                                        title={label}
+                                    >
+                                        <Icon className="w-3.5 h-3.5" />
+                                        <span className="hidden sm:inline">{label}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <button className="flex items-center gap-2 px-4 py-2 bg-card-bg rounded-full font-bold text-sm text-slate-light shadow-sm border border-slate-700 transition-all will-change-transform hover:brightness-110 active:scale-95">
+                                <Filter className="w-4 h-4" />
+                                <span className="hidden sm:inline">Filtros</span>
+                            </button>
+                            <div className="px-4 py-2 bg-card-bg rounded-full font-bold text-sm text-slate-light shadow-sm border border-slate-700 flex items-center gap-2 select-none">
+                                <span className="hidden sm:inline">Ordenar:</span>
+                                <span className="text-periwinkle capitalize text-xs sm:text-sm">Mais recente</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 2: Dynamic categories */}
+                    <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            visible: { transition: { staggerChildren: 0.02 } },
+                        }}
+                        className="flex flex-wrap gap-2"
+                    >
+                        {categories.map((cat) => {
+                            const IconComponent = iconMap[cat.icon];
+                            return (
+                                <motion.button
+                                    key={cat.id}
+                                    variants={{
+                                        hidden: { opacity: 0, y: 12 },
+                                        visible: { opacity: 1, y: 0 },
+                                    }}
+                                    transition={{ type: "spring", stiffness: 260, damping: 24 }}
+                                    onClick={() => setActiveCategoryId(cat.id)}
+                                    className={`px-5 py-2 rounded-full font-bold text-sm flex items-center gap-1.5 will-change-transform ${activeCategoryId === cat.id
+                                        ? 'bg-periwinkle text-charcoal shadow-clay-btn'
+                                        : 'bg-card-bg text-slate-light hover:bg-hover-bg hover:text-periwinkle border border-slate-700'
+                                        }`}
+                                >
+                                    {IconComponent && <IconComponent className="w-4 h-4" />}
+                                    {cat.name_pt}
+                                </motion.button>
+                            );
+                        })}
+                    </motion.div>
+                    </>
+                )}
             </div>
 
             {/* Smart Bento Grid */}

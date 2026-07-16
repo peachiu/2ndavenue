@@ -1,13 +1,14 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Share2, ShoppingBag, ShieldCheck, User, ArrowLeft, Loader2, Check, CheckCheck } from "lucide-react";
+import { Heart, Share2, ShoppingBag, ShieldCheck, User, ArrowLeft, Loader2, Check, CheckCheck, MessageCircle, Send, X } from "lucide-react";
 import Link from "next/link";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useCart } from "@/context/CartContext";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import Toast from "@/components/Toast";
 
 const CONDITION_LABELS: Record<string, string> = {
     new: "novo",
@@ -51,6 +52,12 @@ export default function ProductDetailPage() {
     const [followState, setFollowState] = useState<{ isFollowing: boolean; isFollowedBy: boolean; isFriend: boolean } | null>(null);
     const [togglingFollow, setTogglingFollow] = useState(false);
     const [shareCopied, setShareCopied] = useState(false);
+    const [showContactModal, setShowContactModal] = useState(false);
+    const [contactMessage, setContactMessage] = useState("");
+    const [sendingContact, setSendingContact] = useState(false);
+    const [toastVisible, setToastVisible] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const router = useRouter();
 
     useEffect(() => {
         setIsMounted(true);
@@ -138,6 +145,8 @@ export default function ProductDetailPage() {
             image_url: product.images?.[0] || "/images/placeholder.svg",
             seller_name: product.seller_name,
         });
+        setToastMessage(`${product.title} adicionado à bag`);
+        setToastVisible(true);
     };
 
     // Share
@@ -348,6 +357,15 @@ export default function ProductDetailPage() {
                                     <ShoppingBag className="w-6 h-6" />
                                     Adiciona à bag
                                 </button>
+                                {session?.user && Number((session.user as any).id) !== Number(product?.seller_id) && (
+                                    <button
+                                        onClick={() => setShowContactModal(true)}
+                                        className="clay-btn-secondary w-full py-4 text-base flex items-center justify-center gap-2"
+                                    >
+                                        <MessageCircle className="w-5 h-5" />
+                                        Contactar vendedor
+                                    </button>
+                                )}
                                 <p className="text-center text-[10px] text-slate-lighter font-bold flex items-center justify-center gap-1 uppercase tracking-widest">
                                     <ShieldCheck className="w-3 h-3" />
                                     Garantia SecondAvenue
@@ -383,11 +401,115 @@ export default function ProductDetailPage() {
                             {formatPrice(product.price, product.currency)}
                         </p>
                     </div>
-                    <button className="clay-btn px-10 py-5 text-lg flex items-center gap-3 h-full">
-                        Compra agora
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {session?.user && Number((session.user as any).id) !== Number(product?.seller_id) && (
+                            <button
+                                onClick={() => setShowContactModal(true)}
+                                className="clay-btn-secondary px-4 py-4 text-sm flex items-center gap-2"
+                            >
+                                <MessageCircle className="w-4 h-4" />
+                            </button>
+                        )}
+                        <button
+                            onClick={handleAddToCart}
+                            className="clay-btn px-8 py-4 text-base flex items-center gap-2"
+                        >
+                            <ShoppingBag className="w-5 h-5" />
+                            Adicionar
+                        </button>
+                    </div>
                 </motion.div>
             )}
+
+            {/* Toast Notification */}
+            <Toast
+                message={toastMessage}
+                visible={toastVisible}
+                onClose={() => setToastVisible(false)}
+            />
+
+            {/* Contact Modal */}
+            <AnimatePresence>
+                {showContactModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setShowContactModal(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="clay-card p-6 w-full max-w-md bg-card-bg"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-black tracking-tight">Contactar vendedor</h3>
+                                <button
+                                    onClick={() => setShowContactModal(false)}
+                                    className="p-2 text-slate-lighter hover:text-off-white hover:bg-hover-bg rounded-xl transition-all"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <p className="text-sm text-slate-light font-medium mb-3">
+                                Mensagem para <span className="text-periwinkle">{product.seller_name}</span>
+                            </p>
+                            <textarea
+                                value={contactMessage}
+                                onChange={e => setContactMessage(e.target.value)}
+                                placeholder="Olá! Tenho interesse neste anúncio..."
+                                rows={4}
+                                className="w-full bg-charcoal border border-slate-700 rounded-2xl px-4 py-3 text-sm text-off-white placeholder-slate-lighter/50 focus:outline-none focus:border-periwinkle resize-none transition-colors"
+                            />
+                            <div className="flex justify-end gap-3 mt-4">
+                                <button
+                                    onClick={() => setShowContactModal(false)}
+                                    className="px-5 py-3 rounded-2xl text-sm font-bold text-slate-lighter hover:text-off-white hover:bg-hover-bg transition-all"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={async () => {
+                                        if (!contactMessage.trim() || sendingContact || !product) return;
+                                        setSendingContact(true);
+                                        try {
+                                            const res = await fetch("/api/conversations", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({
+                                                    listing_id: product.id,
+                                                    receiver_id: product.seller_id,
+                                                    content: contactMessage.trim(),
+                                                }),
+                                            });
+                                            if (!res.ok) throw new Error("Erro ao enviar");
+                                            const data = await res.json();
+                                            router.push(`/messages/${data.conversation_id}`);
+                                        } catch (err) {
+                                            console.error(err);
+                                        } finally {
+                                            setSendingContact(false);
+                                        }
+                                    }}
+                                    disabled={!contactMessage.trim() || sendingContact}
+                                    className="clay-btn px-6 py-3 text-sm flex items-center gap-2 disabled:opacity-30"
+                                >
+                                    {sendingContact ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Send className="w-4 h-4" />
+                                    )}
+                                    Enviar
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </main>
     );
 }

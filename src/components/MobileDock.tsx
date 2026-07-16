@@ -22,7 +22,7 @@ export default function MobileDock() {
     if (pathname?.startsWith('/product/')) return null;
 
     return (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden w-[90%] max-w-[400px]">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] md:hidden w-[90%] max-w-[400px]">
             <div className="bg-card-bg/95 backdrop-blur-xl rounded-full p-2 flex items-center justify-between shadow-2xl border border-slate-700 px-4">
                 {DOCK_ITEMS.map((item) => {
                     const isActive = pathname === item.href;

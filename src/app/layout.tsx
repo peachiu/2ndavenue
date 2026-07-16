@@ -40,7 +40,7 @@ export default function RootLayout({
                 <Providers>
                     <div className="flex flex-col min-h-screen">
                         <TopNavbar />
-                        <main className="flex-grow pt-20">
+                        <main className="flex-grow pt-16 md:pt-20">
                             {children}
                         </main>
                         <MobileDock />

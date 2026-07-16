@@ -14,7 +14,7 @@ export default function Home() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-5xl md:text-7xl font-black tracking-tight mb-6 px-2"
+                    className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tight mb-4 md:mb-6 px-2"
                 >
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-periwinkle to-indigo-400 leading-[1.1] inline-block">
                         A avenida que tem<br />tudo para todos
@@ -24,7 +24,7 @@ export default function Home() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-lg md:text-2xl font-medium text-slate-light max-w-2xl mx-auto leading-relaxed"
+                    className="text-sm sm:text-lg md:text-2xl font-medium text-slate-light max-w-2xl mx-auto leading-relaxed"
                 >
                     Um mercado para todos. Compra, vende e descobre peças únicas para o teu mundo.
                 </motion.p>
@@ -33,22 +33,22 @@ export default function Home() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
-                    className="mt-10 flex flex-col sm:flex-row justify-center gap-4 max-w-sm mx-auto sm:max-w-none items-stretch sm:items-center"
+                    className="mt-6 md:mt-10 flex flex-col sm:flex-row justify-center gap-3 md:gap-4 max-w-sm mx-auto sm:max-w-none items-stretch sm:items-center"
                 >
                     <Link href="/create-listing" className="flex">
                         <motion.button
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
-                            className="clay-btn w-full sm:w-auto px-8 py-4 text-lg"
+                            className="clay-btn w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg"
                         >
                             Começa a vender
                         </motion.button>
                     </Link>
-                    <Link href="#discover" className="flex">
+                    <Link href="/feed" className="flex">
                         <motion.button
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
-                            className="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-charcoal bg-off-white shadow-sm hover:shadow-md transition-all border border-slate-700"
+                            className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg rounded-full font-bold text-charcoal bg-off-white shadow-sm hover:shadow-md transition-all border border-slate-700"
                         >
                             Descobre
                         </motion.button>
@@ -56,7 +56,7 @@ export default function Home() {
                 </motion.div>
             </section>
 
-            <ProductFeed limit={8} showViewAll={true} />
+            <ProductFeed limit={6} showViewAll={true} simple title="Populares" />
         </div>
     );
 }

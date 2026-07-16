@@ -48,7 +48,17 @@ export default function CheckoutPage() {
     if (!isMounted) return null;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+
+        // Postal code mask: 0000-000 (auto-add hyphen after 4 digits)
+        if (name === "shipping_postal_code") {
+            const digits = value.replace(/\D/g, "").slice(0, 7);
+            const masked = digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits;
+            setForm((prev) => ({ ...prev, shipping_postal_code: masked }));
+            return;
+        }
+
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
