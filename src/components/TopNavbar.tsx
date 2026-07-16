@@ -29,10 +29,9 @@ export default function TopNavbar() {
                 {/* Left: Logo */}
                 <Link href="/" className="flex items-center gap-2 md:gap-3 group flex-shrink-0">
                     <img src="/logo.png" alt="SecondAvenue"
-                        className="h-8 w-8 md:h-10 md:w-10 object-contain"
-                        style={{ borderRadius: 16 }}
+                        className="h-8 w-8 md:h-10 md:w-10 object-contain rounded-xl"
                     />
-                    <span className="text-lg md:text-xl font-black tracking-tighter text-off-white lowercase hidden sm:block">
+                    <span className="text-lg md:text-xl font-black tracking-tighter text-off-white lowercase hidden sm:block leading-none">
                         secondavenue
                     </span>
                 </Link>

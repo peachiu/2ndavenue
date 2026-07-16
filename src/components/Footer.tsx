@@ -2,15 +2,14 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="mt-20 border-t border-slate-700 bg-card-bg/50 backdrop-blur-xl pt-16 pb-24 md:pb-8">
+        <footer className="mt-5 border-t border-slate-700 bg-card-bg/50 backdrop-blur-xl pt-16 pb-24 md:pb-8">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                     {/* Brand Col */}
                     <div className="md:col-span-1 space-y-6">
                         <Link href="/" className="flex items-center gap-3">
                             <img src="/logo.png" alt="SecondAvenue"
-                                className="h-8 w-8 object-contain"
-                                style={{ borderRadius: 9999 }}
+                                className="h-8 w-8 object-contain rounded-xl"
                             />
                             <span className="text-lg font-black tracking-tight text-off-white lowercase">
                                 secondavenue
@@ -25,29 +24,17 @@ export default function Footer() {
                     <div className="space-y-4">
                         <h4 className="font-black text-off-white">Marketplace</h4>
                         <ul className="space-y-2 text-sm font-bold text-slate-lighter italic">
-                            <li><Link href="/feed" className="hover:text-periwinkle transition-colors">Todos os drops</Link></li>
-                            <li><Link href="/feed" className="hover:text-periwinkle transition-colors">Categorias</Link></li>
-                            <li><Link href="/create-listing" className="hover:text-periwinkle transition-colors">Vender</Link></li>
+                            <li><Link href="/feed" className="hover:text-periwinkle transition-colors">Todos os produtos</Link></li>
+                            <li><Link href="/create-listing" className="hover:text-periwinkle transition-colors">Vende o teu artigo</Link></li>
+                            <li><Link href="/dashboard" className="hover:text-periwinkle transition-colors">As minhas peças</Link></li>
                         </ul>
                     </div>
 
                     {/* Studio Links */}
                     <div className="space-y-4">
-                        <h4 className="font-black text-off-white">Estúdio</h4>
+                        <h4 className="font-black text-off-white">Sobre ti</h4>
                         <ul className="space-y-2 text-sm font-bold text-slate-lighter italic">
                             <li><Link href="/dashboard" className="hover:text-periwinkle transition-colors">Painel</Link></li>
-                            <li><Link href="/create-listing" className="hover:text-periwinkle transition-colors">Publica a tua peça</Link></li>
-                            <li><Link href="/dashboard" className="hover:text-periwinkle transition-colors">As minhas peças</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Legal Links */}
-                    <div className="space-y-4">
-                        <h4 className="font-black text-off-white">Legal</h4>
-                        <ul className="space-y-2 text-sm font-bold text-slate-lighter italic">
-                            <li><Link href="/privacidade" className="hover:text-periwinkle transition-colors">Privacidade</Link></li>
-                            <li><Link href="/termos" className="hover:text-periwinkle transition-colors">Termos de Utilização</Link></li>
-                            <li><Link href="/cookies" className="hover:text-periwinkle transition-colors">Cookies</Link></li>
                         </ul>
                     </div>
                 </div>

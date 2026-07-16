@@ -33,13 +33,13 @@ export default function Home() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
-                    className="mt-6 md:mt-10 flex flex-col sm:flex-row justify-center gap-3 md:gap-4 max-w-sm mx-auto sm:max-w-none items-stretch sm:items-center"
+                    className="mt-6 md:mt-10 flex flex-col sm:flex-row justify-center gap-3 md:gap-4 max-w-xs mx-auto sm:max-w-none items-stretch sm:items-center"
                 >
                     <Link href="/create-listing" className="flex">
                         <motion.button
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
-                            className="clay-btn w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg"
+                            className="clay-btn w-full px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg"
                         >
                             Começa a vender
                         </motion.button>
@@ -48,7 +48,7 @@ export default function Home() {
                         <motion.button
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
-                            className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg rounded-full font-bold text-charcoal bg-off-white shadow-sm hover:shadow-md transition-all border border-slate-700"
+                            className="w-full px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg rounded-full font-bold text-charcoal bg-off-white shadow-sm hover:shadow-md transition-all border border-slate-700"
                         >
                             Descobre
                         </motion.button>

@@ -84,7 +84,7 @@ export default async function ProfilePage() {
                                     {dbUser.name}
                                 </h1>
                                 <p className="text-slate-light font-medium">
-                                    {dbUser.role === 'professional' ? 'Profissional' : 'Comunidade'} • membro desde {new Date(dbUser.created_at).toLocaleDateString()}
+                                    {dbUser.role === 'professional' ? 'Profissional' : 'Comunidade'} • membro desde {new Date(dbUser.created_at).toLocaleDateString("pt-PT")}
                                 </p>
                             </div>
                             <button className="clay-btn px-8 py-3 lowercase">editar perfil</button>

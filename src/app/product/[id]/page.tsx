@@ -185,18 +185,18 @@ export default function ProductDetailPage() {
     const conditionKey = product.condition_rating?.toLowerCase().replace(" ", "_") || "good";
 
     return (
-        <main className="min-h-screen bg-charcoal pb-32 md:pb-20 pt-8 select-none">
+        <main className="min-h-screen bg-charcoal pb-36 md:pb-20 pt-8 select-none">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
                 {/* Back Button */}
-                <Link href="/" className="inline-flex items-center gap-2 text-sm font-black text-slate-lighter lowercase hover:text-periwinkle transition-colors mb-8 group">
+                <Link href="/" className="inline-flex items-center gap-2 text-sm font-black text-slate-lighter lowercase hover:text-periwinkle transition-colors mb-4 md:mb-8 group">
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                     voltar ao feed
                 </Link>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
 
                     {/* Left: Messy Content (Images + Description) */}
-                    <div className="md:col-span-2 space-y-12">
+                    <div className="md:col-span-2 space-y-8 md:space-y-12">
                         {/* Image Gallery */}
                         <div className="flex flex-col gap-6">
                             <motion.div
@@ -220,7 +220,7 @@ export default function ProductDetailPage() {
                                     <button
                                         onClick={toggleFavorite}
                                         disabled={togglingFav || !session}
-                                        className={`p-4 bg-card-bg/90 backdrop-blur-md rounded-full shadow-lg transition-all active:scale-90 ${
+                                        className={`p-3 md:p-4 bg-card-bg/90 backdrop-blur-md rounded-full shadow-lg transition-all active:scale-90 ${
                                             favorited
                                                 ? 'text-rose-400 bg-rose-500/20 shadow-rose-500/20'
                                                 : 'text-slate-lighter hover:text-rose-400'
@@ -230,7 +230,7 @@ export default function ProductDetailPage() {
                                     </button>
                                     <button
                                         onClick={shareProduct}
-                                        className="p-4 bg-card-bg/90 backdrop-blur-md rounded-full shadow-lg text-slate-lighter hover:text-periwinkle transition-all active:scale-90"
+                                        className="p-3 md:p-4 bg-card-bg/90 backdrop-blur-md rounded-full shadow-lg text-slate-lighter hover:text-periwinkle transition-all active:scale-90"
                                     >
                                         {shareCopied ? <Check className="w-5 h-5 text-emerald-400" /> : <Share2 className="w-5 h-5" />}
                                     </button>
@@ -260,24 +260,24 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* Mobile-only Title/Price (Visible only if not in desktop) */}
-                        <div className="md:hidden space-y-2">
-                            <h1 className="text-4xl font-black tracking-tighter mb-2 leading-none select-text">
+                        <div className="md:hidden space-y-1">
+                            <h1 className="text-2xl font-black tracking-tighter mb-1 leading-none select-text">
                                 {product.title}
                             </h1>
-                            <p className="text-2xl font-bold text-periwinkle">{formatPrice(product.price, product.currency)}</p>
+                            <p className="text-base font-bold text-periwinkle">{formatPrice(product.price, product.currency)}</p>
                         </div>
 
                         {/* Full Description & Details */}
-                        <div className="space-y-10 pr-0 md:pr-12">
-                            <section className="space-y-4">
-                                <h2 className="text-2xl font-black tracking-tight">Sobre a peça</h2>
-                                <p className="text-xl text-slate-light font-medium leading-relaxed select-text">
+                        <div className="space-y-6 md:space-y-10 pr-0 md:pr-12">
+                            <section className="space-y-3 md:space-y-4">
+                                <h2 className="text-xl md:text-2xl font-black tracking-tight">Sobre a peça</h2>
+                                <p className="text-sm md:text-xl text-slate-light font-medium leading-relaxed select-text">
                                     {product.description}
                                 </p>
                                 {product.tags?.length > 0 && (
-                                    <div className="flex flex-wrap gap-3 pt-2">
+                                    <div className="flex flex-wrap gap-2 md:gap-3 pt-2">
                                         {product.tags.map(tag => (
-                                            <span key={tag} className="px-4 py-2 bg-card-bg rounded-full text-sm font-bold text-slate-lighter cursor-pointer hover:text-periwinkle border border-slate-700 transition-colors">
+                                            <span key={tag} className="px-3 py-1.5 md:px-4 md:py-2 bg-card-bg rounded-full text-xs md:text-sm font-bold text-slate-lighter cursor-pointer hover:text-periwinkle border border-slate-700 transition-colors">
                                                 {tag}
                                             </span>
                                         ))}
@@ -285,9 +285,9 @@ export default function ProductDetailPage() {
                                 )}
                             </section>
 
-                            <section className="space-y-4 pt-4 border-t border-slate-700">
-                                <h3 className="text-lg font-black tracking-tight">Detalhes da peça</h3>
-                                <div className="grid grid-cols-2 gap-6">
+                            <section className="space-y-3 md:space-y-4 pt-4 border-t border-slate-700">
+                                <h3 className="text-base md:text-lg font-black tracking-tight">Detalhes da peça</h3>
+                                <div className="grid grid-cols-2 gap-4 md:gap-6">
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold text-slate-lighter uppercase tracking-widest">tamanho</p>
                                         <p className="font-bold text-off-white">—</p>
@@ -304,9 +304,9 @@ export default function ProductDetailPage() {
                             </section>
 
                             {/* Seller Info */}
-                            <section className="clay-card p-8 flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-14 w-14 bg-hover-bg rounded-full flex items-center justify-center overflow-hidden shadow-inner text-slate-lighter">
+                            <section className="clay-card p-4 md:p-8 flex items-center justify-between">
+                                <div className="flex items-center gap-3 md:gap-4">
+                                    <div className="h-10 w-10 md:h-14 md:w-14 bg-hover-bg rounded-full flex items-center justify-center overflow-hidden shadow-inner text-slate-lighter">
                                         {product.seller_image ? (
                                             <img src={product.seller_image} alt={product.seller_name} draggable={false} className="w-full h-full object-cover pointer-events-none" />
                                         ) : (
@@ -314,14 +314,14 @@ export default function ProductDetailPage() {
                                         )}
                                     </div>
                                     <div>
-                                        <p className="font-black text-off-white leading-none mb-1">{product.seller_name}</p>
-                                        <p className="text-xs font-bold text-slate-lighter">vendedor</p>
+                                        <p className="text-sm md:text-base font-black text-off-white leading-none mb-1">{product.seller_name}</p>
+                                        <p className="text-[10px] md:text-xs font-bold text-slate-lighter">vendedor</p>
                                     </div>
                                 </div>
                                 <button
                                     onClick={toggleFollow}
                                     disabled={!session || Number((session.user as any)?.id) === Number(product?.seller_id)}
-                                    className={`px-5 py-2 rounded-full border-2 font-bold transition-all active:scale-95 disabled:opacity-30 ${
+                                    className={`px-3 md:px-5 py-1.5 md:py-2 rounded-full border-2 font-bold text-xs md:text-sm transition-all active:scale-95 disabled:opacity-30 ${
                                         followState?.isFriend
                                             ? 'border-periwinkle bg-periwinkle/10 text-periwinkle'
                                             : followState?.isFollowing
@@ -393,11 +393,11 @@ export default function ProductDetailPage() {
                     initial={{ y: 100 }}
                     animate={{ y: 0 }}
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="md:hidden fixed bottom-0 left-0 right-0 z-[60] bg-card-bg/90 backdrop-blur-xl border-t border-slate-700 px-6 py-6 pb-8 flex items-center justify-between"
+                    className="md:hidden fixed bottom-0 left-0 right-0 z-[60] bg-card-bg/90 backdrop-blur-xl border-t border-slate-700 px-4 md:px-6 py-3 md:py-4 pb-24 flex items-center justify-between"
                 >
                     <div>
                         <p className="text-xs font-black text-slate-lighter uppercase tracking-widest mb-1">Preço</p>
-                        <p className="text-3xl font-black text-periwinkle leading-none">
+                        <p className="text-lg font-black text-periwinkle leading-none">
                             {formatPrice(product.price, product.currency)}
                         </p>
                     </div>
@@ -405,17 +405,19 @@ export default function ProductDetailPage() {
                         {session?.user && Number((session.user as any).id) !== Number(product?.seller_id) && (
                             <button
                                 onClick={() => setShowContactModal(true)}
-                                className="clay-btn-secondary px-4 py-4 text-sm flex items-center gap-2"
+                                className="clay-btn-secondary px-3 md:px-4 py-3 md:py-4 text-xs flex items-center gap-2 whitespace-nowrap"
                             >
                                 <MessageCircle className="w-4 h-4" />
+                                <span className="md:hidden">Contactar</span>
                             </button>
                         )}
                         <button
                             onClick={handleAddToCart}
-                            className="clay-btn px-8 py-4 text-base flex items-center gap-2"
+                            className="clay-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-base flex items-center gap-2"
                         >
                             <ShoppingBag className="w-5 h-5" />
-                            Adicionar
+                            <span className="hidden sm:inline">Adicionar</span>
+                            <span className="sm:hidden">Bag</span>
                         </button>
                     </div>
                 </motion.div>

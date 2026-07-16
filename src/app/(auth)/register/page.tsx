@@ -46,7 +46,20 @@ export default function RegisterPage() {
             if (!res.ok) {
                 setError(data.message || "algo correu mal");
             } else {
-                router.push("/login?registered=true");
+                // Auto sign-in after successful registration
+                const result = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
+
+                if (result?.ok) {
+                    sessionStorage.setItem("toast", `bem-vindo à avenue, ${firstName}! 🎉`);
+                    router.push("/setup");
+                    router.refresh();
+                } else {
+                    router.push("/login?registered=true");
+                }
             }
         } catch (err) {
             setError("algo correu mal");

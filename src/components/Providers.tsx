@@ -1,11 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { CartProvider } from "@/context/CartContext";
 import CartSidePanel from "@/components/CartSidePanel";
 import Toast from "@/components/Toast";
+
+function OnboardingGuard({ children }: { children: React.ReactNode }) {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+    const [checked, setChecked] = useState(false);
+
+    useEffect(() => {
+        if (status === "loading" || checked) return;
+        if (!session?.user) {
+            setChecked(true);
+            return;
+        }
+
+        // Skip if already on the setup page
+        if (window.location.pathname.startsWith("/setup")) {
+            setChecked(true);
+            return;
+        }
+
+        fetch("/api/setup")
+            .then((r) => r.json())
+            .then((data) => {
+                if (!data.onboarded) {
+                    router.push("/setup");
+                }
+                setChecked(true);
+            })
+            .catch(() => setChecked(true));
+    }, [session, status, router, checked]);
+
+    return <>{children}</>;
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
     const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -23,7 +56,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <SessionProvider>
             <CurrencyProvider>
                 <CartProvider>
-                    {children}
+                    <OnboardingGuard>
+                        {children}
+                    </OnboardingGuard>
                     <CartSidePanel />
                 </CartProvider>
                 <Toast
