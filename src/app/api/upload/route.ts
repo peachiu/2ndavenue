@@ -22,7 +22,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Máximo de 8 imagens" }, { status: 400 });
         }
 
-        const uploadDir = path.join(process.cwd(), "public", "images", "products");
+        const uploadDir = path.join(process.cwd(), "uploads", "images", "products");
         await mkdir(uploadDir, { recursive: true });
 
         const urls: string[] = [];
@@ -42,8 +42,8 @@ export async function POST(request: Request) {
             const bytes = await file.arrayBuffer();
             await writeFile(filePath, Buffer.from(bytes));
 
-            // Store relative URL
-            urls.push(`/images/products/${filename}`);
+            // Store URL pointing to our API route (bypasses Next.js static manifest limitation)
+            urls.push(`/api/images/${filename}`);
         }
 
         return NextResponse.json({ success: true, urls }, { status: 200 });

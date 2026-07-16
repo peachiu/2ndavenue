@@ -27,7 +27,10 @@ export default function SetupPage() {
     const [phone, setPhone] = useState("");
     const [cookieConsent, setCookieConsent] = useState(true);
 
-    // Check if already onboarded
+    // Form error state
+    const [error, setError] = useState("");
+
+    // Check if already onboarded — with timeout fallback
     useEffect(() => {
         if (status === "loading") return;
         if (!session) {
@@ -35,9 +38,17 @@ export default function SetupPage() {
             return;
         }
 
-        fetch("/api/setup")
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+            controller.abort();
+            setLoading(false);
+            setName(session?.user?.name || "");
+        }, 8000);
+
+        fetch("/api/setup", { signal: controller.signal })
             .then((r) => r.json())
             .then((data) => {
+                clearTimeout(timeout);
                 if (data.onboarded) {
                     router.push("/");
                 } else {
@@ -46,11 +57,18 @@ export default function SetupPage() {
                 }
             })
             .catch(() => {
+                clearTimeout(timeout);
                 setLoading(false);
             });
+
+        return () => {
+            clearTimeout(timeout);
+            controller.abort();
+        };
     }, [session, status, router]);
 
     const handleNext = () => {
+        setError("");
         if (step < STEPS.length - 1) {
             setStep((s) => s + 1);
         } else {
@@ -60,6 +78,7 @@ export default function SetupPage() {
 
     const handleSubmit = async () => {
         setSaving(true);
+        setError("");
         try {
             const res = await fetch("/api/setup", {
                 method: "POST",
@@ -78,9 +97,13 @@ export default function SetupPage() {
                     router.push("/");
                     router.refresh();
                 }, 2000);
+            } else {
+                const data = await res.json().catch(() => ({}));
+                setError(data.message || "Erro ao guardar. Tenta novamente.");
             }
         } catch (err) {
             console.error("Setup error:", err);
+            setError("Erro de conexão. Verifica a tua internet e tenta novamente.");
         } finally {
             setSaving(false);
         }
@@ -271,6 +294,11 @@ export default function SetupPage() {
                                     </label>
                                 </div>
                             </div>
+                        )}
+
+                        {/* Error message */}
+                        {error && (
+                            <p className="text-sm font-bold text-red-400 text-center">{error}</p>
                         )}
 
                         {/* Actions */}

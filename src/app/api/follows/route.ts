@@ -89,27 +89,46 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Não podes seguir-te a ti próprio" }, { status: 400 });
         }
 
+        const myId = session.user.id;
+
         // Check if already following
         const [existing] = await pool.query(
             "SELECT id FROM follows WHERE follower_id = ? AND following_id = ? LIMIT 1",
-            [session.user.id, user_id]
+            [myId, user_id]
         );
 
         if ((existing as any[]).length > 0) {
             // Unfollow
             await pool.query(
                 "DELETE FROM follows WHERE follower_id = ? AND following_id = ?",
-                [session.user.id, user_id]
+                [myId, user_id]
             );
-            return NextResponse.json({ following: false });
+        } else {
+            // Follow
+            await pool.query(
+                "INSERT INTO follows (follower_id, following_id) VALUES (?, ?)",
+                [myId, user_id]
+            );
         }
 
-        // Follow
-        await pool.query(
-            "INSERT INTO follows (follower_id, following_id) VALUES (?, ?)",
-            [session.user.id, user_id]
+        // Return full relationship state (like GET does)
+        const [following] = await pool.query(
+            "SELECT id FROM follows WHERE follower_id = ? AND following_id = ? LIMIT 1",
+            [myId, user_id]
         );
-        return NextResponse.json({ following: true });
+        const [followedBy] = await pool.query(
+            "SELECT id FROM follows WHERE follower_id = ? AND following_id = ? LIMIT 1",
+            [user_id, myId]
+        );
+
+        const isFollowing = (following as any[]).length > 0;
+        const isFollowedBy = (followedBy as any[]).length > 0;
+
+        return NextResponse.json({
+            isFollowing,
+            isFollowedBy,
+            isFriend: isFollowing && isFollowedBy,
+        });
     } catch (error) {
         console.error("Follows API error:", error);
         return NextResponse.json({ error: "Erro interno" }, { status: 500 });

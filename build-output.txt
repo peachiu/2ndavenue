@@ -1,0 +1,59 @@
+﻿Ôû▓ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 17.2s
+  Running TypeScript ...
+  Finished TypeScript in 11.4s ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/31) ...
+  Generating static pages using 3 workers (7/31) 
+  Generating static pages using 3 workers (15/31) 
+  Generating static pages using 3 workers (23/31) 
+Ô£ô Generating static pages using 3 workers (31/31) in 1058ms
+  Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ ãÆ /admin
+Ôö£ ãÆ /admin/listings
+Ôö£ ãÆ /admin/users
+Ôö£ ãÆ /api/admin/listings
+Ôö£ ãÆ /api/admin/stats
+Ôö£ ãÆ /api/admin/users
+Ôö£ ãÆ /api/auth/[...nextauth]
+Ôö£ ãÆ /api/auth/register
+Ôö£ ãÆ /api/categories
+Ôö£ ãÆ /api/checkout
+Ôö£ ãÆ /api/conversations
+Ôö£ ãÆ /api/favorites
+Ôö£ ãÆ /api/follows
+Ôö£ ãÆ /api/listings
+Ôö£ ãÆ /api/messages
+Ôö£ ãÆ /api/orders/[id]
+Ôö£ ãÆ /api/products/[id]
+Ôö£ ãÆ /api/setup
+Ôö£ ãÆ /api/upload
+Ôö£ Ôùï /checkout
+Ôö£ Ôùï /cookies
+Ôö£ ãÆ /create-listing
+Ôö£ ãÆ /dashboard
+Ôö£ Ôùï /favorites
+Ôö£ Ôùï /feed
+Ôö£ Ôùï /login
+Ôö£ ãÆ /messages
+Ôö£ ãÆ /messages/[id]
+Ôö£ ãÆ /order/[id]
+Ôö£ Ôùï /privacidade
+Ôö£ ãÆ /product/[id]
+Ôö£ ãÆ /profile
+Ôö£ Ôùï /register
+Ôö£ Ôùï /search
+Ôö£ Ôùï /setup
+Ôöö Ôùï /termos
+
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

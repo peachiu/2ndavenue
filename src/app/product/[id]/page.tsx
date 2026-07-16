@@ -97,7 +97,11 @@ export default function ProductDetailPage() {
         if (!product?.seller_id || !session?.user) return;
         fetch(`/api/follows?user_id=${product.seller_id}`)
             .then(r => r.json())
-            .then(d => setFollowState(d))
+            .then(d => {
+                if (d && typeof d.isFriend === 'boolean') {
+                    setFollowState(d);
+                }
+            })
             .catch(() => {});
     }, [product?.seller_id, session?.user]);
 
@@ -128,7 +132,9 @@ export default function ProductDetailPage() {
                 body: JSON.stringify({ user_id: product.seller_id }),
             });
             const data = await res.json();
-            setFollowState(prev => prev ? { ...prev, isFollowing: data.following, isFriend: data.following && prev.isFollowedBy } : null);
+            if (data && typeof data.isFriend === 'boolean') {
+                setFollowState({ isFollowing: data.isFollowing, isFollowedBy: data.isFollowedBy, isFriend: data.isFriend });
+            }
         } catch {}
         setTogglingFollow(false);
     };

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ImageIcon } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 
 const CONDITION_LABELS: Record<string, string> = {
@@ -12,6 +13,17 @@ const CONDITION_LABELS: Record<string, string> = {
     fair: "ok",
     poor: "tem uso",
 };
+
+function ImagePlaceholder({ className = "" }: { className?: string }) {
+    return (
+        <div className={`flex items-center justify-center bg-hover-bg ${className}`}>
+            <div className="text-center">
+                <ImageIcon className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-1 sm:mb-2 text-slate-500" />
+                <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Sem imagem</p>
+            </div>
+        </div>
+    );
+}
 
 interface ProductCardProps {
     id: number;
@@ -41,6 +53,10 @@ export default function ProductCard({
 }: ProductCardProps) {
     const { formatPrice } = useCurrency();
 
+    // Images served via /api/images/ are outside Next.js static manifest,
+    // so we use unoptimized rendering to bypass the Image Optimization API
+    const isApiImage = image_url?.startsWith("/api/images/");
+
     const conditionKey = condition.toLowerCase().replace(" ", "_");
 
     // ── Grid variant (square card) ─────────────────────────
@@ -54,15 +70,20 @@ export default function ProductCard({
                         <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-card-bg/90 backdrop-blur-md rounded-full text-[9px] font-black uppercase tracking-widest text-periwinkle shadow-sm">
                             {CONDITION_LABELS[conditionKey] || conditionKey}
                         </div>
-                        <Image
-                            src={image_url}
-                            alt={title}
-                            fill
-                            loading="lazy"
-                            draggable={false}
-                            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
-                            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-                        />
+                        {image_url ? (
+                            <Image
+                                src={image_url}
+                                alt={title}
+                                fill
+                                loading="lazy"
+                                draggable={false}
+                                unoptimized={isApiImage}
+                                className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
+                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                            />
+                        ) : (
+                            <ImagePlaceholder className="absolute inset-0" />
+                        )}
                     </div>
                     <div className="p-4 bg-card-bg/50 backdrop-blur-sm border-t border-slate-700">
                         <h4 className="font-bold text-off-white truncate mb-0.5 select-text text-sm">
@@ -88,15 +109,18 @@ export default function ProductCard({
                         <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-card-bg/90 backdrop-blur-md rounded-full text-[9px] font-black uppercase tracking-widest text-periwinkle shadow-sm">
                             {CONDITION_LABELS[conditionKey] || conditionKey}
                         </div>
-                        <Image
-                            src={image_url}
-                            alt={title}
-                            fill
-                            loading="lazy"
-                            draggable={false}
-                            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
-                            sizes="180px"
-                        />
+                        {image_url ? (
+                            <Image
+                                src={image_url}
+                                alt={title}
+                                fill
+                                loading="lazy"
+                                draggable={false}                                unoptimized={isApiImage}                                className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
+                                sizes="180px"
+                            />
+                        ) : (
+                            <ImagePlaceholder className="absolute inset-0" />
+                        )}
                     </div>
                     <div className="flex-1 p-5 flex flex-col justify-center min-w-0">
                         <h4 className="font-black text-off-white truncate select-text text-lg mb-1">
@@ -124,15 +148,20 @@ export default function ProductCard({
                 <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-card-bg/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-periwinkle shadow-sm">
                     {CONDITION_LABELS[conditionKey] || conditionKey}
                 </div>
-                <Image
-                    src={image_url}
-                    alt={title}
-                    fill
-                    loading="lazy"
-                    draggable={false}
-                    className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                />
+                {image_url ? (
+                    <Image
+                        src={image_url}
+                        alt={title}
+                        fill
+                        loading="lazy"
+                        draggable={false}
+                        unoptimized={isApiImage}
+                        className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                    />
+                ) : (
+                    <ImagePlaceholder className="absolute inset-0" />
+                )}
             </div>
 
             <div className="p-6 bg-card-bg/50 backdrop-blur-sm border-t border-slate-700">
