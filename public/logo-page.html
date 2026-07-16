@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecondAvenue — Logótipo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #f5f5f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 40px 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        /* ── Big logo ── */
+        .logo-box {
+            width: 320px;
+            height: 320px;
+            background: linear-gradient(135deg, #a8aef5, #5170ff);
+            border-radius: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 40px rgba(26, 26, 46, 0.2);
+            transition: transform 0.3s ease;
+            cursor: default;
+        }
+
+        .logo-box:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-box .s {
+            color: #ffffff;
+            font-size: 240px;
+            font-weight: 900;
+            line-height: 1;
+            margin-top: -10px;
+            letter-spacing: -4px;
+            user-select: none;
+        }
+
+        .logo-name {
+            font-size: 36px;
+            font-weight: 900;
+            color: #1a1a2e;
+            letter-spacing: 2px;
+            text-transform: lowercase;
+        }
+
+        /* ── Download buttons ── */
+        .download-section {
+            text-align: center;
+        }
+
+        .download-section h2 {
+            font-size: 18px;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            background: #ffffff;
+            color: #1a1a2e;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a8aef5, #5170ff);
+            color: #ffffff;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .divider {
+            width: 100%;
+            max-width: 500px;
+            height: 1px;
+            background: #e0e0e0;
+            margin: 40px 0;
+        }
+
+        .info {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        /* ── PNG preview ── */
+        #preview-canvas {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .logo-box {
+                width: 220px;
+                height: 220px;
+                border-radius: 48px;
+            }
+            .logo-box .s {
+                font-size: 160px;
+                margin-top: -6px;
+            }
+            .logo-name {
+                font-size: 26px;
+            }
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <!-- Big logo -->
+        <div class="logo-box" id="logo-box">
+            <span class="s">s</span>
+        </div>
+        <div class="logo-name">secondavenue</div>
+    </div>
+
+    <div class="download-section">
+        <h2>⬇️ Descarregar logótipo</h2>
+        <div class="btn-group">
+            <a href="/logo.svg" download="secondavenue-logo.svg" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                SVG
+            </a>
+            <button onclick="downloadPNG()" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                PNG (HD)
+            </a>
+            <a href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI0MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnR3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNhOGFlZjU7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzUxNzBmZjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxODAiIHJ4PSI0MCIgcnk9IjQwIiBmaWxsPSJ1cmwoI2JnR3JhZCkiLz4KICA8dGV4dCB4PSIxMDAiIHk9IjEzOCIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sIEJsaW5rTWFjU3lzdGVtRm9udCwgJ1NlZ29lIFVJJywgUm9ib3RvLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEzMCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9Ii0yIj5zPC90ZXh0PgogIDx0ZXh0IHg9IjEwMCIgeT0iMjE4IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBSb2JvdG8sIEhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMxYTFhMmUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIxIj5zZWNvbmRhdmVudWU8L3RleHQ+Cjwvc3ZnPg==" download="secondavenue-logo.svg" class="btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.5 8.5 12 13l-4.5-4.5"/><line x1="12" y1="13" x2="12" y2="3"/></svg>
+                SVG (inline)
+            </a>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="info">
+        <p>📐 O logótipo SecondAvenue em formato SVG vetorial.<br>Podes redimensionar para qualquer tamanho sem perder qualidade.</p>
+        <p style="margin-top: 10px;">Clica com o botão direito no logótipo acima → "Guardar imagem como…"</p>
+    </div>
+
+    <!-- Hidden canvas for PNG export -->
+    <canvas id="preview-canvas"></canvas>
+
+    <script>
+        async function downloadPNG() {
+            const canvas = document.getElementById('preview-canvas');
+            const ctx = canvas.getContext('2d');
+            const size = 1024;
+            canvas.width = size;
+            canvas.height = size + 80; // room for brand name
+
+            // Background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Logo rounded rect
+            const logoSize = size * 0.8;
+            const logoX = (size - logoSize) / 2;
+            const logoY = 20;
+            const radius = logoSize * 0.22;
+
+            // Shadow
+            ctx.shadowColor = 'rgba(26, 26, 46, 0.2)';
+            ctx.shadowBlur = 30;
+            ctx.shadowOffsetY = 8;
+
+            // Gradient background
+            const grad = ctx.createLinearGradient(logoX, logoY, logoX + logoSize, logoY + logoSize);
+            grad.addColorStop(0, '#a8aef5');
+            grad.addColorStop(1, '#5170ff');
+
+            ctx.beginPath();
+            ctx.moveTo(logoX + radius, logoY);
+            ctx.lineTo(logoX + logoSize - radius, logoY);
+            ctx.quadraticCurveTo(logoX + logoSize, logoY, logoX + logoSize, logoY + radius);
+            ctx.lineTo(logoX + logoSize, logoY + logoSize - radius);
+            ctx.quadraticCurveTo(logoX + logoSize, logoY + logoSize, logoX + logoSize - radius, logoY + logoSize);
+            ctx.lineTo(logoX + radius, logoY + logoSize);
+            ctx.quadraticCurveTo(logoX, logoY + logoSize, logoX, logoY + logoSize - radius);
+            ctx.lineTo(logoX, logoY + radius);
+            ctx.quadraticCurveTo(logoX, logoY, logoX + radius, logoY);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Reset shadow for text
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Letter "s"
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `900 ${logoSize * 0.65}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('s', size / 2, logoY + logoSize / 2 + 4);
+
+            // Brand name
+            ctx.fillStyle = '#1a1a2e';
+            ctx.font = `900 ${size * 0.036}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+            ctx.fillText('secondavenue', size / 2, logoY + logoSize + 55);
+
+            // Create download link
+            const link = document.createElement('a');
+            link.download = 'secondavenue-logo.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+
+</body>
+</html>

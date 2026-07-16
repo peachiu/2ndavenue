@@ -56,7 +56,7 @@ export default function Home() {
                 </motion.div>
             </section>
 
-            <ProductFeed />
+            <ProductFeed limit={8} showViewAll={true} />
         </div>
     );
 }

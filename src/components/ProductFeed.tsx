@@ -4,10 +4,12 @@ import {
     Filter, Grid3X3, Shirt, Footprints, Watch, Monitor,
     Sofa, Car, Trophy, BookOpen, Palette, Baby,
     Sparkles, PawPrint, Package, LayoutGrid, List, LayoutDashboard,
+    ArrowRight,
     type LucideIcon
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import ProductGrid from "./ProductGrid";
 
 // Map icon names from DB to Lucide components
@@ -39,7 +41,12 @@ interface Product {
     views?: number;
 }
 
-export default function ProductFeed() {
+interface ProductFeedProps {
+    limit?: number;
+    showViewAll?: boolean;
+}
+
+export default function ProductFeed({ limit, showViewAll }: ProductFeedProps = {}) {
     const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
@@ -70,6 +77,8 @@ export default function ProductFeed() {
     const filteredProducts = activeCategoryId === null
         ? products
         : products.filter(p => p.category_id === activeCategoryId);
+
+    const displayProducts = limit ? filteredProducts.slice(0, limit) : filteredProducts;
 
     return (
         <section id="discover" className="max-w-7xl mx-auto px-4 md:px-8 mb-20 scroll-mt-32">
@@ -178,7 +187,20 @@ export default function ProductFeed() {
                     ))}
                 </div>
             ) : (
-                <ProductGrid products={filteredProducts} layout={layout} />
+                <>
+                    <ProductGrid products={displayProducts} layout={layout} />
+                    {showViewAll && products.length > (limit || Infinity) && (
+                        <div className="flex justify-end mt-8">
+                            <Link
+                                href="/feed"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-card-bg text-periwinkle font-bold rounded-full border border-slate-700 hover:border-periwinkle/50 hover:bg-hover-bg transition-all text-sm"
+                            >
+                                Explorar tudo
+                                <ArrowRight className="w-4 h-4" />
+                            </Link>
+                        </div>
+                    )}
+                </>
             )}
         </section>
     );

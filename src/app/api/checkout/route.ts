@@ -140,9 +140,9 @@ async function sendReceiptEmail(
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; margin: 0; padding: 0;">
             <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 30px;">
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="background: #5170ff; width: 50px; height: 50px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                        <span style="color: white; font-size: 30px; font-weight: 900;">s</span>
-                    </div>
+                    <img src="https://secondavenue.pt/logo.png" alt="SecondAvenue"
+                        style="width: 50px; height: 50px; border-radius: 16px; margin-bottom: 10px;"
+                    />
                     <h1 style="color: #1a1a2e; font-size: 24px; margin: 0;">Recibo de Compra</h1>
                     <p style="color: #666; font-size: 14px;">SecondAvenue</p>
                 </div>

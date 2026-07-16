@@ -5,6 +5,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import TopNavbar from "@/components/TopNavbar";
 import MobileDock from "@/components/MobileDock";
+import CookieConsent from "@/components/CookieConsent";
 import { Providers } from "@/components/Providers";
 
 const manrope = Manrope({
@@ -19,8 +20,8 @@ export const metadata: Metadata = {
     icons: {
         icon: [
             {
-                url: `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%235170ff"/><text x="32" y="46" font-family="Inter,sans-serif" font-size="52" font-weight="900" fill="%23e5e5e5" text-anchor="middle">s</text></svg>`,
-                type: "image/svg+xml",
+                url: "/logo.png",
+                type: "image/png",
             },
         ],
     },
@@ -43,6 +44,7 @@ export default function RootLayout({
                             {children}
                         </main>
                         <MobileDock />
+                        <CookieConsent />
                         <Footer />
                     </div>
                 </Providers>

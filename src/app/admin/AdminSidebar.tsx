@@ -40,11 +40,10 @@ export default function AdminSidebar({ user }: { user: any }) {
                 href="/admin"
                 className="flex items-center gap-3 px-6 h-20 border-b border-slate-700 group"
             >
-                <div className="h-9 w-9 bg-periwinkle rounded-xl flex items-center justify-center shadow-clay-card group-hover:-rotate-2 transition-all duration-300">
-                    <span className="text-off-white font-black text-xl leading-[0] -translate-y-1">
-                        s
-                    </span>
-                </div>
+                <img src="/logo.png" alt="SecondAvenue"
+                    className="h-9 w-9 object-contain"
+                    style={{ borderRadius: 10 }}
+                />
                 <div>
                     <p className="font-black text-off-white text-sm leading-tight">
                         Admin
