@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { SessionProvider } from "next-auth/react";
 import { CurrencyProvider } from "@/context/CurrencyContext";
+import { CartProvider } from "@/context/CartContext";
+import CartSidePanel from "@/components/CartSidePanel";
 import Toast from "@/components/Toast";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -20,7 +22,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <SessionProvider>
             <CurrencyProvider>
-                {children}
+                <CartProvider>
+                    {children}
+                    <CartSidePanel />
+                </CartProvider>
                 <Toast
                     message={toastMsg || ""}
                     visible={!!toastMsg}

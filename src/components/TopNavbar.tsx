@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import {
     Search, Shirt, Footprints, Watch, Monitor,
     Sofa, Car, Trophy, BookOpen, Palette, Baby,
-    Sparkles, PawPrint, Package, Heart, MessageCircle, X, type LucideIcon
+    Sparkles, PawPrint, Package, Heart, MessageCircle, ShoppingBag, X, type LucideIcon
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import UserNav from "./UserNav";
+import { useCart } from "@/context/CartContext";
 
 // Map icon names from DB to Lucide components
 const iconMap: Record<string, LucideIcon> = {
@@ -28,6 +29,7 @@ interface Category {
 
 export default function TopNavbar() {
     const router = useRouter();
+    const { openCart, totalItems } = useCart();
     const [categories, setCategories] = useState<Category[]>([]);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -175,6 +177,21 @@ export default function TopNavbar() {
                             <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
                     </Link>
+
+                    {/* Cart Button */}
+                    <button
+                        onClick={openCart}
+                        className="relative p-2 md:p-3 text-slate-lighter hover:text-periwinkle hover:bg-hover-bg rounded-2xl transition-all"
+                        aria-label="Abrir carrinho"
+                    >
+                        <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
+                        {totalItems > 0 && (
+                            <span className="absolute -top-0.5 -right-0.5 md:-top-1 md:-right-1 bg-periwinkle text-charcoal text-[9px] md:text-[10px] font-black min-w-[16px] md:min-w-[20px] h-4 md:h-5 flex items-center justify-center rounded-full px-1 shadow-lg">
+                                {totalItems > 99 ? "99+" : totalItems}
+                            </span>
+                        )}
+                    </button>
+
                     <UserNav />
                 </div>
             </div>

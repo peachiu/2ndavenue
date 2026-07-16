@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Share2, ShoppingBag, ShieldCheck, User, ArrowLeft, Loader2, Check, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useCart } from "@/context/CartContext";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -38,6 +39,7 @@ interface ProductData {
 
 export default function ProductDetailPage() {
     const { formatPrice } = useCurrency();
+    const { addItem, openCart } = useCart();
     const { data: session } = useSession();
     const params = useParams();
     const [product, setProduct] = useState<ProductData | null>(null);
@@ -122,6 +124,20 @@ export default function ProductDetailPage() {
             setFollowState(prev => prev ? { ...prev, isFollowing: data.following, isFriend: data.following && prev.isFollowedBy } : null);
         } catch {}
         setTogglingFollow(false);
+    };
+
+    // Add to cart
+    const handleAddToCart = () => {
+        if (!product) return;
+        addItem({
+            id: product.id,
+            listing_id: product.id,
+            title: product.title,
+            price: product.price,
+            currency: product.currency,
+            image_url: product.images?.[0] || "/images/placeholder.svg",
+            seller_name: product.seller_name,
+        });
     };
 
     // Share
@@ -325,7 +341,10 @@ export default function ProductDetailPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <button className="clay-btn w-full py-5 text-xl flex items-center justify-center gap-3">
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="clay-btn w-full py-5 text-xl flex items-center justify-center gap-3"
+                                >
                                     <ShoppingBag className="w-6 h-6" />
                                     Adiciona à bag
                                 </button>
